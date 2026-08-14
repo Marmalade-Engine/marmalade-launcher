@@ -19,7 +19,7 @@
                            VerticalAlignment="Center" />
                        
                 <TextBox Text="{Binding DefaultInstallLocation, Mode=TwoWay}" 
-                         PlaceholderText="{Binding DefaultPathPlaceholder}" 
+                         PlaceholderText="{Binding DefaultPathPlaceholder}"
                          AcceptsReturn="False" 
                          Height="35"
                          Width="420" 

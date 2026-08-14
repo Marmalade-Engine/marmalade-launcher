@@ -12,10 +12,18 @@ sealed class Program
     public static void Main(string[] args) => BuildAvaloniaApp()
         .StartWithClassicDesktopLifetime(args);
 
-    // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            .With(new Win32PlatformOptions  {
+                RenderingMode = new[] { Win32RenderingMode.Software }
+            })
+            .With(new AvaloniaNativePlatformOptions {
+                RenderingMode = new[] { AvaloniaNativeRenderingMode.Software }
+            })
+            .With(new X11PlatformOptions {
+                RenderingMode = new[] { X11RenderingMode.Software }
+            })
 #if DEBUG
             .WithDeveloperTools()
 #endif

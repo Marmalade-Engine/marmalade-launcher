@@ -7,25 +7,28 @@ public partial class ProjectsViewModel : ViewModelBase { }
 public partial class InstallationsViewModel : ViewModelBase { }
 
 public partial class MainViewModel : ViewModelBase {
+    private readonly ProjectsViewModel _projectsViewModel = new();
+    private readonly InstallationsViewModel _installationsViewModel = new();
+    private readonly SettingsViewModel _settingsViewModel = new();
+
     [ObservableProperty] 
     private ViewModelBase _currentPage;
-
+    
     public MainViewModel() {
-        _currentPage = new ProjectsViewModel();
+        _currentPage = _projectsViewModel;
     }
 
     [RelayCommand]
-    private void OpenProjects() {
-        CurrentPage = new ProjectsViewModel();
-    }
+    private void OpenProjects() => SwitchPage(_projectsViewModel);
     
     [RelayCommand]
-    private void OpenInstallations() {
-        CurrentPage = new InstallationsViewModel();
-    }
+    private void OpenInstallations() => SwitchPage(_installationsViewModel);
     
     [RelayCommand]
-    private void OpenSettings() {
-        CurrentPage = new SettingsViewModel();
+    private void OpenSettings() => SwitchPage(_settingsViewModel);
+    
+    private void SwitchPage(ViewModelBase page) {
+        if (CurrentPage == page) return;
+        CurrentPage = page;
     }
 }
