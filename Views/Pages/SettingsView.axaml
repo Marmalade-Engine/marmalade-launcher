@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MarmaladeLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MarmaladeLauncher.Views.Pages.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+    
+    <Grid RowDefinitions="*, Auto" Margin="20">
+        <StackPanel Grid.Row="0" Spacing="10">
+            <TextBlock FontSize="22" Margin="0,0,0,20" FontWeight="Bold">Settings</TextBlock>
+            <TextBlock FontSize="18" Margin="0,0,0,2">Engine Settings</TextBlock>
+
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="Default Editor Installation Path" 
+                           FontSize="16" 
+                           FontStyle="Italic" 
+                           VerticalAlignment="Center" />
+                       
+                <TextBox Text="{Binding DefaultInstallLocation, Mode=TwoWay}" 
+                         PlaceholderText="{Binding DefaultPathPlaceholder}" 
+                         AcceptsReturn="False" 
+                         Height="35"
+                         Width="420" 
+                         VerticalAlignment="Center" />
+                
+                <Button Content="Browse..."
+                        Command="{Binding BrowseFolderCommand}"
+                        VerticalAlignment="Center"/>
+
+                <Button Content="Reset"
+                        Command="{Binding ResetToDefaultCommand}"
+                        ToolTip.Tip="Reset path back to launcher default location"
+                        VerticalAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Spacing="10"
+                    IsVisible="{Binding IsDirty}">
+            <Button Content="Cancel" 
+                    Command="{Binding CancelCommand}"
+                    Width="90" 
+                    HorizontalContentAlignment="Center" />
+            <Button Content="Save" 
+                    Command="{Binding SaveCommand}" 
+                    Width="90" 
+                    HorizontalContentAlignment="Center" 
+                    Classes="accent" />
+        </StackPanel>
+    </Grid>
+</UserControl>

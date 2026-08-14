@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MarmaladeLauncher.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MarmaladeLauncher.Views.Components.SidebarView"
+             x:DataType="vm:MainViewModel">
+    
+    <Grid RowDefinitions="*, Auto" Margin="8">
+        
+        <StackPanel Grid.Row="0" Spacing="8">
+            <Button Content="Projects"
+                    Command="{Binding OpenProjectsCommand}"
+                    HorizontalAlignment="Stretch" />
+            
+            <Button Content="Installations"
+                    Command="{Binding OpenInstallationsCommand}"
+                    HorizontalAlignment="Stretch" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Spacing="8">
+            <Button Content="Settings"
+                    Command="{Binding OpenSettingsCommand}"
+                    HorizontalAlignment="Stretch" />
+        </StackPanel>
+
+    </Grid>
+    
+</UserControl>
