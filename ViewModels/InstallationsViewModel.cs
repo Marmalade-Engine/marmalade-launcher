@@ -20,18 +20,20 @@ namespace MarmaladeLauncher.ViewModels;
 
 public partial class InstallationsViewModel : ViewModelBase {
     private readonly InstallationService _installService;
+    private readonly SettingsService _settingsService;
 
     [ObservableProperty] private ObservableCollection<EngineInstallation> _installations = new();
     
     [ObservableProperty]
     private bool _hasInstallations;
     
-    public InstallationsViewModel(InstallationService installService) {
+    public InstallationsViewModel(InstallationService installService, SettingsService settingsService) {
         _installService = installService;
+        _settingsService = settingsService;
         _ = LoadData();
     }
 
-    public InstallationsViewModel() : this(new InstallationService()) { }        
+    public InstallationsViewModel() : this(new InstallationService(), new SettingsService()) { }        
     
     private async Task LoadData() {
         var list = await _installService.LoadInstallations();
@@ -51,9 +53,6 @@ public partial class InstallationsViewModel : ViewModelBase {
 
             var fileTypes = new List<FilePickerFileType>();
 
-            // I am having difficulty with having the system allow the user to select the *.app file and it go from there
-            // currently you need to browse to the marmalade executable inside the .app file inside finder and drag and
-            // drop it into the file picker window
             if (OperatingSystem.IsMacOS()) {
                 fileTypes.Add(new FilePickerFileType("macOS Applications") {
                     AppleUniformTypeIdentifiers = new[] { "com.apple.application-bundle", "com.apple.executable" },
@@ -123,22 +122,119 @@ public partial class InstallationsViewModel : ViewModelBase {
     }
 
     [RelayCommand]
-    private void LaunchInstallation(EngineInstallation item) {
+    private async Task LaunchInstallation(EngineInstallation item) {
         if (item == null || string.IsNullOrWhiteSpace(item.ExecutablePath))
             return;
 
         try {
-            var startInfo = new ProcessStartInfo {
-                FileName = item.ExecutablePath,
-                Arguments = item.Arguments ?? string.Empty,
-                UseShellExecute = true,
-            };
-            
-            Process.Start(startInfo);
-            Console.WriteLine($"[Launch] Started '{item.Name}' with args: '{item.Arguments}'");
+            ProcessStartInfo startInfo;
+
+            if (OperatingSystem.IsMacOS()) {
+                startInfo = CreateMacDetachedStartInfo(item);
+            }
+            else if (OperatingSystem.IsLinux()) {
+                startInfo = CreateLinuxDetachedStartInfo(item);
+            }
+            else {
+                startInfo = new ProcessStartInfo {
+                    FileName = item.ExecutablePath,
+                    Arguments = item.Arguments ?? string.Empty,
+                    UseShellExecute = true,
+                    WorkingDirectory = Path.GetDirectoryName(item.ExecutablePath) ?? string.Empty
+                };
+            }
+
+            using (var process = Process.Start(startInfo)) {
+                Console.WriteLine($"[Launch] Detached process started for '{item.Name}' with args: '{item.Arguments}'");
+            }
+
+            await ExecutePostLaunchBehaviorAsync();
         }
         catch (Exception e) {
             Console.WriteLine($"[Launch] Error launching executable: {e.Message}");
+        }
+    }
+
+    private ProcessStartInfo CreateMacDetachedStartInfo(EngineInstallation item) {
+        string workingDir = Path.GetDirectoryName(item.ExecutablePath) ?? string.Empty;
+        string appBundlePath = GetMacAppBundlePath(item.ExecutablePath);
+
+        if (!string.IsNullOrEmpty(appBundlePath)) { 
+            var args = $"-n \"{appBundlePath}\"";
+            if (!string.IsNullOrWhiteSpace(item.Arguments)) {
+                args += $" --args {item.Arguments}";
+            }
+
+            return new ProcessStartInfo {
+                FileName = "/usr/bin/open",
+                Arguments = args,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = workingDir
+            };
+        }
+
+        string binaryArgs = string.IsNullOrWhiteSpace(item.Arguments) ? "" : $" {item.Arguments}";
+        return new ProcessStartInfo {
+            FileName = "/bin/zsh",
+            Arguments = $"-c \"nohup '{item.ExecutablePath}'{binaryArgs} > /dev/null 2>&1 &\"",
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WorkingDirectory = workingDir
+        };
+    }
+
+    private ProcessStartInfo CreateLinuxDetachedStartInfo(EngineInstallation item) {
+        string workingDir = Path.GetDirectoryName(item.ExecutablePath) ?? string.Empty;
+        string binaryArgs = string.IsNullOrWhiteSpace(item.Arguments) ? "" : $" {item.Arguments}";
+
+        return new ProcessStartInfo {
+            FileName = "/bin/bash",
+            Arguments = $"-c \"nohup '{item.ExecutablePath}'{binaryArgs} > /dev/null 2>&1 &\"",
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WorkingDirectory = workingDir
+        };
+    }
+
+    private string GetMacAppBundlePath(string executablePath) {
+        if (executablePath.EndsWith(".app", StringComparison.OrdinalIgnoreCase) && Directory.Exists(executablePath)) {
+            return executablePath;
+        }
+
+        int appIndex = executablePath.IndexOf(".app", StringComparison.OrdinalIgnoreCase);
+        if (appIndex != -1) {
+            string bundlePath = executablePath.Substring(0, appIndex + 4);
+            if (Directory.Exists(bundlePath)) {
+                return bundlePath;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private async Task ExecutePostLaunchBehaviorAsync() {
+        _settingsService.LoadSettings();
+        
+        var behavior = _settingsService.Settings.PostLaunchBehaviour;
+
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+            switch (behavior) {
+                case PostLaunchBehaviour.PostLaunchBehaviour_MINIMISE:
+                    if (desktop.MainWindow != null) {
+                        desktop.MainWindow.WindowState = WindowState.Minimized;
+                    }
+                    break;
+
+                case PostLaunchBehaviour.PostLaunchBehaviour_CLOSE:
+                    await Task.Delay(200);
+                    desktop.Shutdown();
+                    break;
+
+                case PostLaunchBehaviour.PostLaunchBehaviour_KEEPOPEN:
+                default:
+                    break;
+            }
         }
     }
 

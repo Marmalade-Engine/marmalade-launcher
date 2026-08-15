@@ -38,7 +38,7 @@ public class SettingsService {
         }
     }
 
-    private void LoadSettings() {
+    public void LoadSettings() {
         try {
             if (File.Exists(SettingsFilePath)) {
                 string json = File.ReadAllText(SettingsFilePath);

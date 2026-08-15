@@ -3,36 +3,57 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:MarmaladeLauncher.ViewModels"
+             xmlns:m="using:MarmaladeLauncher.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MarmaladeLauncher.Views.Pages.SettingsView"
              x:DataType="vm:SettingsViewModel">
     
     <Grid RowDefinitions="*, Auto" Margin="20">
-        <StackPanel Grid.Row="0" Spacing="10">
-            <TextBlock FontSize="22" Margin="0,0,0,20" FontWeight="Bold">Settings</TextBlock>
-            <TextBlock FontSize="18" Margin="0,0,0,2">Engine Settings</TextBlock>
+        <StackPanel Grid.Row="0" Spacing="20">
+            <TextBlock FontSize="22" FontWeight="Bold">Settings</TextBlock>
 
-            <StackPanel Orientation="Horizontal" Spacing="10">
-                <TextBlock Text="Default Editor Installation Path" 
-                           FontSize="16" 
-                           FontStyle="Italic" 
-                           VerticalAlignment="Center" />
-                       
-                <TextBox Text="{Binding DefaultInstallLocation, Mode=TwoWay}" 
-                         PlaceholderText="{Binding DefaultPathPlaceholder}"
-                         AcceptsReturn="False" 
-                         Height="35"
-                         Width="420" 
-                         VerticalAlignment="Center" />
-                
-                <Button Content="Browse..."
-                        Command="{Binding BrowseFolderCommand}"
-                        VerticalAlignment="Center"/>
+            <StackPanel Spacing="10">
+                <TextBlock FontSize="18" FontWeight="SemiBold">Engine Settings</TextBlock>
 
-                <Button Content="Reset"
-                        Command="{Binding ResetToDefaultCommand}"
-                        ToolTip.Tip="Reset path back to launcher default location"
-                        VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="Default Editor Installation Path" 
+                               FontSize="14" 
+                               VerticalAlignment="Center" />
+                           
+                    <TextBox Text="{Binding DefaultInstallLocation, Mode=TwoWay}" 
+                             PlaceholderText="{Binding DefaultPathPlaceholder}"
+                             AcceptsReturn="False" 
+                             Height="35"
+                             Width="380" 
+                             VerticalAlignment="Center" />
+                    
+                    <Button Content="Browse..."
+                            Command="{Binding BrowseFolderCommand}"
+                            VerticalAlignment="Center"/>
+
+                    <Button Content="Reset"
+                            Command="{Binding ResetToDefaultCommand}"
+                            ToolTip.Tip="Reset path back to launcher default location"
+                            VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Separator Background="{DynamicResource SystemControlForegroundBaseLowBrush}" />
+
+            <StackPanel Spacing="10">
+                <TextBlock FontSize="18" FontWeight="SemiBold">Launcher Settings</TextBlock>
+
+                <StackPanel Orientation="Horizontal" Spacing="15">
+                    <TextBlock Text="When an engine launches:" 
+                               FontSize="14" 
+                               VerticalAlignment="Center" />
+
+                    <ComboBox ItemsSource="{Binding PostLaunchOptions}"
+                              SelectedItem="{Binding SelectedPostLaunchOption, Mode=TwoWay}"
+                              DisplayMemberBinding="{Binding DisplayName}"
+                              Width="220"
+                              VerticalAlignment="Center" />
+                </StackPanel>
             </StackPanel>
         </StackPanel>
 
