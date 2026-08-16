@@ -11,7 +11,7 @@ public class SettingsService {
     public LauncherSettings Settings { get; set; } = new();
 
     public static string AppDataDir => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "marmalade-launcher"
     );
     
