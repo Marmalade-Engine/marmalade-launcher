@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -15,10 +16,12 @@ public partial class App : Application {
     public override void OnFrameworkInitializationCompleted() {
         var settingsService = new SettingsService();
         settingsService.EnsureDirectoriesExist();
-        
+
+        var localisationService = new LocalisationService(settingsService);
+    
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
             desktop.MainWindow = new MainWindow {
-                DataContext = new MainViewModel(),
+                DataContext = new MainViewModel(settingsService, localisationService),
             };
         }
 

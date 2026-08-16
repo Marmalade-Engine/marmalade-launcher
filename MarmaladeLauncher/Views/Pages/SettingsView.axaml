@@ -54,6 +54,32 @@
                               Width="220"
                               VerticalAlignment="Center" />
                 </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" Spacing="15">
+                    <TextBlock Text="Language"
+                               FontSize="14"
+                               VerticalAlignment="Center"/>
+
+                    <ComboBox ItemsSource="{Binding Locales}"
+                              SelectedItem="{Binding SelectedLocale, Mode=TwoWay}"
+                              Width="260"
+                              VerticalAlignment="Center">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="m:LocalisationEntry+LanguageMetadata">
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <TextBlock Text="{Binding DisplayName}"/>
+
+                                    <TextBlock Text="{Binding StatusSuffix}" 
+                                               FontStyle="Italic"
+                                               FontSize="12"
+                                               Opacity="0.6"
+                                               IsVisible="{Binding IsPartial}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
 

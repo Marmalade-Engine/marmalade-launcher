@@ -15,12 +15,18 @@ public record PostLaunchOption(PostLaunchBehaviour Value, string DisplayName);
 
 public partial class SettingsViewModel : ViewModelBase {
     private readonly SettingsService _settingsService;
+    private readonly LocalisationService _localisationService;
 
     [ObservableProperty]
     private string _defaultInstallLocation = string.Empty;
 
     [ObservableProperty]
     private PostLaunchOption _selectedPostLaunchOption = null!;
+    
+    public List<LocalisationEntry.LanguageMetadata> Locales { get; } = LocalisationEntry.LanguageDisplay.languages;
+    
+    [ObservableProperty]
+    private LocalisationEntry.LanguageMetadata? _selectedLocale;
     
     [ObservableProperty]
     private bool _isDirty;
@@ -33,26 +39,36 @@ public partial class SettingsViewModel : ViewModelBase {
         new(PostLaunchBehaviour.PostLaunchBehaviour_CLOSE, "Close launcher")
     };
     
-    public SettingsViewModel(SettingsService settingsService) {
+    public SettingsViewModel(SettingsService settingsService, LocalisationService localisationService) {
         _settingsService = settingsService;
+        _localisationService = localisationService;
+        
         ResetToSaved();
     }
 
-    public SettingsViewModel() : this(new SettingsService()) { }
+    public SettingsViewModel() : this(new SettingsService(), new LocalisationService(new SettingsService())) { }
 
     partial void OnDefaultInstallLocationChanged(string value) {
         CheckDirtyState();
     }
     
     partial void OnSelectedPostLaunchOptionChanged(PostLaunchOption value) => CheckDirtyState();
-    
+
+    partial void OnSelectedLocaleChanged(LocalisationEntry.LanguageMetadata? value) {
+        if (value != null && _localisationService != null) {
+            _localisationService.CurrentLocale = value.LocaleKey;
+        }
+        CheckDirtyState();
+    }
+
     private void CheckDirtyState() {
         if (_settingsService?.Settings == null) return;
 
         bool isLocationDirty = DefaultInstallLocation != _settingsService.Settings.DefaultInstallLocation;
         bool isBehaviorDirty = SelectedPostLaunchOption?.Value != _settingsService.Settings.PostLaunchBehaviour;
-
-        IsDirty = isLocationDirty || isBehaviorDirty;
+        bool isLocaleDirty = _selectedLocale?.LocaleKey != _settingsService.Settings.CurrentLocale;
+        
+        IsDirty = isLocationDirty || isBehaviorDirty || isLocaleDirty;
     }
 
     [RelayCommand]
@@ -68,11 +84,16 @@ public partial class SettingsViewModel : ViewModelBase {
     [RelayCommand]
     private void ResetToSaved() {
         var savedBehaviour = _settingsService.Settings.PostLaunchBehaviour;
-
+        
+        var savedLocaleKey = _settingsService.Settings.CurrentLocale;
+        
+        DefaultInstallLocation = _settingsService.Settings.DefaultInstallLocation;
+        
         SelectedPostLaunchOption = PostLaunchOptions.FirstOrDefault(o => o.Value == savedBehaviour) 
                                    ?? PostLaunchOptions[0];
 
-        DefaultInstallLocation = _settingsService.Settings.DefaultInstallLocation;
+        SelectedLocale = Locales.FirstOrDefault(l => l.LocaleKey == savedLocaleKey) 
+                         ?? Locales.FirstOrDefault(l => l.LocaleKey == "en-GB");
     
         IsDirty = false;
     }
@@ -97,7 +118,8 @@ public partial class SettingsViewModel : ViewModelBase {
     private async Task SaveAsync() {
         var updatedSettings = new LauncherSettings {
             DefaultInstallLocation = DefaultInstallLocation,
-            PostLaunchBehaviour = SelectedPostLaunchOption.Value
+            PostLaunchBehaviour = SelectedPostLaunchOption.Value,
+            CurrentLocale = _selectedLocale?.LocaleKey ?? "en-GB"
         };
 
         await _settingsService.SaveSettings(updatedSettings);
