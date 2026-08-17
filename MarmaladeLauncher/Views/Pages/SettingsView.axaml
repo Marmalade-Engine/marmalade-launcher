@@ -4,19 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:MarmaladeLauncher.ViewModels"
              xmlns:m="using:MarmaladeLauncher.Models"
+             xmlns:lang="clr-namespace:MarmaladeLauncher.Assets.Localisation"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MarmaladeLauncher.Views.Pages.SettingsView"
              x:DataType="vm:SettingsViewModel">
     
     <Grid RowDefinitions="*, Auto" Margin="20">
         <StackPanel Grid.Row="0" Spacing="20">
-            <TextBlock FontSize="22" FontWeight="Bold">Settings</TextBlock>
+            <TextBlock FontSize="22" FontWeight="Bold" Text="{x:Static lang:Resources.Settings_Header}"/>
 
             <StackPanel Spacing="10">
-                <TextBlock FontSize="18" FontWeight="SemiBold">Engine Settings</TextBlock>
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{x:Static lang:Resources.Settings_EngineSettings}"/>
 
                 <StackPanel Orientation="Horizontal" Spacing="10">
-                    <TextBlock Text="Default Editor Installation Path" 
+                    <TextBlock Text="{x:Static lang:Resources.Settings_DefaultEngineInstallPath}"
                                FontSize="14" 
                                VerticalAlignment="Center" />
                            
@@ -27,13 +28,13 @@
                              Width="380" 
                              VerticalAlignment="Center" />
                     
-                    <Button Content="Browse..."
+                    <Button Content="{x:Static lang:Resources.Settings_BrowsePrompt}"
                             Command="{Binding BrowseFolderCommand}"
                             VerticalAlignment="Center"/>
 
-                    <Button Content="Reset"
+                    <Button Content="{x:Static lang:Resources.Settings_ResetPath}"
                             Command="{Binding ResetToDefaultCommand}"
-                            ToolTip.Tip="Reset path back to launcher default location"
+                            ToolTip.Tip="{x:Static lang:Resources.Settings_ResetPathTooltip}"
                             VerticalAlignment="Center"/>
                 </StackPanel>
             </StackPanel>
@@ -41,10 +42,10 @@
             <Separator Background="{DynamicResource SystemControlForegroundBaseLowBrush}" />
 
             <StackPanel Spacing="10">
-                <TextBlock FontSize="18" FontWeight="SemiBold">Launcher Settings</TextBlock>
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{x:Static lang:Resources.Settings_LauncherSettings}"/>
 
                 <StackPanel Orientation="Horizontal" Spacing="15">
-                    <TextBlock Text="When an engine launches:" 
+                    <TextBlock Text="{x:Static lang:Resources.Settings_PostLaunchBehaviour}" 
                                FontSize="14" 
                                VerticalAlignment="Center" />
 
@@ -56,7 +57,7 @@
                 </StackPanel>
                 
                 <StackPanel Orientation="Horizontal" Spacing="15">
-                    <TextBlock Text="Language"
+                    <TextBlock Text="{x:Static lang:Resources.Settings_Language}"
                                FontSize="14"
                                VerticalAlignment="Center"/>
 
@@ -88,11 +89,11 @@
                     HorizontalAlignment="Right" 
                     Spacing="10"
                     IsVisible="{Binding IsDirty}">
-            <Button Content="Cancel" 
+            <Button Content="{x:Static lang:Resources.Settings_CancelChanges}" 
                     Command="{Binding CancelCommand}"
                     Width="90" 
                     HorizontalContentAlignment="Center" />
-            <Button Content="Save" 
+            <Button Content="{x:Static lang:Resources.Settings_SaveSettings}" 
                     Command="{Binding SaveCommand}" 
                     Width="90" 
                     HorizontalContentAlignment="Center" 

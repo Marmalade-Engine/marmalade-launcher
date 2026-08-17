@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using Avalonia.Media;
+using MarmaladeLauncher.Views;
 
 namespace MarmaladeLauncher.Services;
 
@@ -21,7 +23,6 @@ public class LocalisationService {
 
     public LocalisationService(SettingsService settingsService) {
         _settingsService = settingsService;
-
         SyncLocale();
     }
 
@@ -31,9 +32,15 @@ public class LocalisationService {
 
         CultureInfo.CurrentCulture = culture;
         CultureInfo.CurrentUICulture = culture;
+        
+        Console.WriteLine($"Setting launcher locale to {CultureInfo.CurrentUICulture.Name}");
     }
 
     private void SyncLocale() {
         CurrentLocale = _settingsService.Settings.CurrentLocale;
+    }
+
+    public void ToggleRTL(Avalonia.Controls.Window w, bool isRTL) {
+        w.FlowDirection = isRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
     }
 }

@@ -3,27 +3,42 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:models="using:MarmaladeLauncher.Models"
+             xmlns:lang="clr-namespace:MarmaladeLauncher.Assets.Localisation"
+             xmlns:vm="clr-namespace:MarmaladeLauncher.ViewModels"
              x:DataType="models:EngineInstallation"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MarmaladeLauncher.Views.Dialogs.InstallationSettingsWindow">
     
-    <StackPanel Margin="20" Spacing="15">
-        <TextBlock Text="Installation Settings" FontSize="18" FontWeight="Bold"/>
+    <Border Background="{DynamicResource SystemRegionBrush}" 
+            CornerRadius="8" 
+            Padding="20" 
+            MinWidth="400"
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Center">
+        <StackPanel Spacing="15">
+            <TextBlock Text="{x:Static lang:Resources.Modal_Installation_Settings}" FontSize="18" FontWeight="Bold"/>
 
-        <StackPanel Spacing="5">
-            <TextBlock Text="Executable Path" FontSize="12" Foreground="Gray"/>
-            <TextBox Text="{Binding ExecutablePath}" IsReadOnly="True" />
+            <StackPanel Spacing="5">
+                <TextBlock Text="{x:Static lang:Resources.Modal_Installation_ExecutablePath}" FontSize="12" Foreground="Gray"/>
+                <TextBox Text="{Binding ExecutablePath}" IsReadOnly="True" />
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="{x:Static lang:Resources.Modal_Installation_CommandLineArguments}" FontSize="12" Foreground="Gray"/>
+                <TextBox Text="{Binding Arguments, Mode=TwoWay}" Watermark="--no-splash" />
+            </StackPanel>
+
+            <Button HorizontalAlignment="Right" 
+                    Command="{Binding $parent[UserControl;1].((vm:InstallationsViewModel)DataContext).CloseSettingsCommand}"
+                    Classes="accent"
+                    Margin="0,10,0,0">
+                <Button.Content>
+                    <MultiBinding StringFormat="{}{0} &amp; {1}">
+                        <Binding Source="{x:Static lang:Resources.Modal_Installation_Save}" />
+                        <Binding Source="{x:Static lang:Resources.Modal_Installation_Close}" />
+                    </MultiBinding>
+                </Button.Content>
+            </Button>
         </StackPanel>
-
-        <StackPanel Spacing="5">
-            <TextBlock Text="Command Line Arguments" FontSize="12" Foreground="Gray"/>
-            <TextBox Text="{Binding Arguments, Mode=TwoWay}" Watermark="--no-splash" />
-        </StackPanel>
-
-        <Button Content="Save &amp; Close" 
-                HorizontalAlignment="Right" 
-                Click="OnCloseClick"
-                Classes="accent"
-                Margin="0,10,0,0"/>
-    </StackPanel>
+    </Border>
 </UserControl>

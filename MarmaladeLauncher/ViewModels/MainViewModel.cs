@@ -1,5 +1,7 @@
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using MarmaladeLauncher.Services;
 
 namespace MarmaladeLauncher.ViewModels;
@@ -7,7 +9,7 @@ namespace MarmaladeLauncher.ViewModels;
 public partial class ProjectsViewModel : ViewModelBase { }
 public partial class InstallationsViewModel : ViewModelBase { }
 
-public partial class MainViewModel : ViewModelBase {
+public partial class MainViewModel : ViewModelBase { 
     private readonly ProjectsViewModel _projectsViewModel = new();
     private readonly InstallationsViewModel _installationsViewModel = new();
     private readonly SettingsViewModel _settingsViewModel = new();

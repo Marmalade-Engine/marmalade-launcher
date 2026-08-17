@@ -14,7 +14,7 @@ namespace MarmaladeLauncher.Assets.Localisation {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static System.Resources.ResourceManager resourceMan;
         
@@ -25,7 +25,7 @@ namespace MarmaladeLauncher.Assets.Localisation {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static System.Resources.ResourceManager ResourceManager {
+        public static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
                     System.Resources.ResourceManager temp = new System.Resources.ResourceManager("MarmaladeLauncher.Assets.Localisation.Resources", typeof(Resources).Assembly);
@@ -36,12 +36,204 @@ namespace MarmaladeLauncher.Assets.Localisation {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static System.Globalization.CultureInfo Culture {
+        public static System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        public static string Toolbar_Projects {
+            get {
+                return ResourceManager.GetString("Toolbar.Projects", resourceCulture);
+            }
+        }
+        
+        public static string Toolbar_Installations {
+            get {
+                return ResourceManager.GetString("Toolbar.Installations", resourceCulture);
+            }
+        }
+        
+        public static string Toolbar_Settings {
+            get {
+                return ResourceManager.GetString("Toolbar.Settings", resourceCulture);
+            }
+        }
+        
+        public static string Projects_Header {
+            get {
+                return ResourceManager.GetString("Projects.Header", resourceCulture);
+            }
+        }
+        
+        public static string Projects_NoProjectsWarning {
+            get {
+                return ResourceManager.GetString("Projects.NoProjectsWarning", resourceCulture);
+            }
+        }
+        
+        public static string Installations_Header {
+            get {
+                return ResourceManager.GetString("Installations.Header", resourceCulture);
+            }
+        }
+        
+        public static string Installations_NoInstallsWarning {
+            get {
+                return ResourceManager.GetString("Installations.NoInstallsWarning", resourceCulture);
+            }
+        }
+        
+        public static string Installations_Remove {
+            get {
+                return ResourceManager.GetString("Installations.Remove", resourceCulture);
+            }
+        }
+        
+        public static string Installations_Settings {
+            get {
+                return ResourceManager.GetString("Installations.Settings", resourceCulture);
+            }
+        }
+        
+        public static string Installations_Launch {
+            get {
+                return ResourceManager.GetString("Installations.Launch", resourceCulture);
+            }
+        }
+        
+        public static string Installations_Locate {
+            get {
+                return ResourceManager.GetString("Installations.Locate", resourceCulture);
+            }
+        }
+        
+        public static string Installations_Install {
+            get {
+                return ResourceManager.GetString("Installations.Install", resourceCulture);
+            }
+        }
+        
+        public static string Modal_Installation_Settings {
+            get {
+                return ResourceManager.GetString("Modal.Installation.Settings", resourceCulture);
+            }
+        }
+        
+        public static string Modal_Installation_ExecutablePath {
+            get {
+                return ResourceManager.GetString("Modal.Installation.ExecutablePath", resourceCulture);
+            }
+        }
+        
+        public static string Modal_Installation_CommandLineArguments {
+            get {
+                return ResourceManager.GetString("Modal.Installation.CommandLineArguments", resourceCulture);
+            }
+        }
+        
+        public static string Modal_Installation_Save {
+            get {
+                return ResourceManager.GetString("Modal.Installation.Save", resourceCulture);
+            }
+        }
+        
+        public static string Modal_Installation_Close {
+            get {
+                return ResourceManager.GetString("Modal.Installation.Close", resourceCulture);
+            }
+        }
+        
+        public static string Settings_Header {
+            get {
+                return ResourceManager.GetString("Settings.Header", resourceCulture);
+            }
+        }
+        
+        public static string Settings_EngineSettings {
+            get {
+                return ResourceManager.GetString("Settings.EngineSettings", resourceCulture);
+            }
+        }
+        
+        public static string Settings_DefaultEngineInstallPath {
+            get {
+                return ResourceManager.GetString("Settings.DefaultEngineInstallPath", resourceCulture);
+            }
+        }
+        
+        public static string Settings_BrowsePrompt {
+            get {
+                return ResourceManager.GetString("Settings.BrowsePrompt", resourceCulture);
+            }
+        }
+        
+        public static string Settings_ResetPath {
+            get {
+                return ResourceManager.GetString("Settings.ResetPath", resourceCulture);
+            }
+        }
+        
+        public static string Settings_ResetPathTooltip {
+            get {
+                return ResourceManager.GetString("Settings.ResetPathTooltip", resourceCulture);
+            }
+        }
+        
+        public static string Settings_LauncherSettings {
+            get {
+                return ResourceManager.GetString("Settings.LauncherSettings", resourceCulture);
+            }
+        }
+        
+        public static string Settings_PostLaunchBehaviour {
+            get {
+                return ResourceManager.GetString("Settings.PostLaunchBehaviour", resourceCulture);
+            }
+        }
+        
+        public static string Settings_PostLaunch_KeepOpen {
+            get {
+                return ResourceManager.GetString("Settings.PostLaunch_KeepOpen", resourceCulture);
+            }
+        }
+        
+        public static string Settings_PostLaunch_Minimise {
+            get {
+                return ResourceManager.GetString("Settings.PostLaunch_Minimise", resourceCulture);
+            }
+        }
+        
+        public static string Settings_PostLaunch_Close {
+            get {
+                return ResourceManager.GetString("Settings.PostLaunch_Close", resourceCulture);
+            }
+        }
+        
+        public static string Settings_Language {
+            get {
+                return ResourceManager.GetString("Settings.Language", resourceCulture);
+            }
+        }
+        
+        public static string Settings_LanguagePartialSupport {
+            get {
+                return ResourceManager.GetString("Settings.LanguagePartialSupport", resourceCulture);
+            }
+        }
+        
+        public static string Settings_SaveSettings {
+            get {
+                return ResourceManager.GetString("Settings.SaveSettings", resourceCulture);
+            }
+        }
+        
+        public static string Settings_CancelChanges {
+            get {
+                return ResourceManager.GetString("Settings.CancelChanges", resourceCulture);
             }
         }
     }

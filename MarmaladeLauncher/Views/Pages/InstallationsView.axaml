@@ -4,103 +4,119 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:MarmaladeLauncher.ViewModels"
              xmlns:m="using:MarmaladeLauncher.Models"
+             xmlns:dialogs="using:MarmaladeLauncher.Views.Dialogs"
+             xmlns:lang="clr-namespace:MarmaladeLauncher.Assets.Localisation"
              x:DataType="vm:InstallationsViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MarmaladeLauncher.Views.Pages.InstallationsView"
              x:Name="RootPage">
     
-    <Grid RowDefinitions="Auto, *, Auto" Margin="20">
-        <!-- Header -->
-        <TextBlock Grid.Row="0" 
-                   Text="Installations" 
-                   FontSize="22" 
-                   FontWeight="Bold" 
-                   HorizontalAlignment="Left" 
-                   Margin="0,0,0,15" />
+    <Grid>
+        <Grid RowDefinitions="Auto, *, Auto" Margin="20">
+            <TextBlock Grid.Row="0" 
+                       Text="{x:Static lang:Resources.Installations_Header}" 
+                       FontSize="22" 
+                       FontWeight="Bold" 
+                       HorizontalAlignment="Left" 
+                       Margin="0,0,0,15" />
 
-        <Panel Grid.Row="1">
-            <!-- Empty state -->
-            <TextBlock Text="You do not have any versions of Marmalade installed" 
-                       FontSize="18"
-                       HorizontalAlignment="Center" 
-                       VerticalAlignment="Center"
-                       IsVisible="{Binding !HasInstallations}" />
+            <Panel Grid.Row="1">
+                <TextBlock Text="{x:Static lang:Resources.Installations_NoInstallsWarning}"  
+                           FontSize="18"
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding !HasInstallations}" />
 
-            <ScrollViewer IsVisible="{Binding HasInstallations}">
-                <ItemsControl ItemsSource="{Binding Installations}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="m:EngineInstallation">
-                            <Border Margin="0,0,0,8" 
-                                    Padding="12" 
-                                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" 
-                                    CornerRadius="6">
-                                
-                                <Grid ColumnDefinitions="*, Auto">
-                                    <StackPanel Grid.Column="0" Spacing="4">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <TextBlock Text="{Binding Name}" 
-                                                       FontWeight="Bold" 
-                                                       FontSize="16"/>
-                                            
-                                            <Border Background="{DynamicResource SystemAccentColor}" 
-                                                    CornerRadius="4" 
-                                                    Padding="6,2" 
-                                                    VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Version}" 
-                                                           Foreground="White" 
-                                                           FontSize="11" 
-                                                           FontWeight="SemiBold"/>
-                                            </Border>
+                <ScrollViewer IsVisible="{Binding HasInstallations}">
+                    <ItemsControl ItemsSource="{Binding Installations}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="m:EngineInstallation">
+                                <Border Margin="0,0,0,8" 
+                                        Padding="12" 
+                                        Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" 
+                                        CornerRadius="6">
+                                    
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <StackPanel Grid.Column="0" Spacing="4">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Name}" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="16"/>
+                                                
+                                                <Border Background="{DynamicResource SystemAccentColor}" 
+                                                        CornerRadius="4" 
+                                                        Padding="6,2" 
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Version}" 
+                                                               Foreground="White" 
+                                                               FontSize="11" 
+                                                               FontWeight="SemiBold"/>
+                                                </Border>
+                                            </StackPanel>
+
+                                            <TextBlock Text="{Binding ExecutablePath}" 
+                                                       Foreground="Gray" 
+                                                       FontSize="12" 
+                                                       TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
 
-                                        <TextBlock Text="{Binding ExecutablePath}" 
-                                                   Foreground="Gray" 
-                                                   FontSize="12" 
-                                                   TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
+                                        <StackPanel Grid.Column="1" 
+                                                    Orientation="Horizontal" 
+                                                    Spacing="8" 
+                                                    VerticalAlignment="Center">
 
-                                    <StackPanel Grid.Column="1" 
-                                                Orientation="Horizontal" 
-                                                Spacing="8" 
-                                                VerticalAlignment="Center">
-
-                                        <Button Content="Remove"
-                                                Background="Red"
-                                                Foreground="White"
-                                                Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).RemoveInstallationCommand}"
-                                                CommandParameter="{Binding}"/>
-                                        
-                                        <Button Content="Settings"
-                                                Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).OpenSettingsCommand}"
-                                                CommandParameter="{Binding}"/>
-                                        
-                                        <Button Content="Launch"
-                                                Classes="accent"
-                                                Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).LaunchInstallationCommand}"
-                                                CommandParameter="{Binding}"/>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </Panel>
-        
-        <StackPanel Grid.Row="2" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right" 
-                    Spacing="10" 
-                    Margin="0,15,0,0">
+                                            <Button Content="{x:Static lang:Resources.Installations_Remove}"
+                                                    Background="Red"
+                                                    Foreground="White"
+                                                    Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).RemoveInstallationCommand}"
+                                                    CommandParameter="{Binding}"/>
+                                            
+                                            <Button Content="{x:Static lang:Resources.Installations_Settings}"
+                                                    Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).OpenSettingsCommand}"
+                                                    CommandParameter="{Binding}"/>
+                                            
+                                            <Button Content="{x:Static lang:Resources.Installations_Launch}"
+                                                    Classes="accent"
+                                                    Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).LaunchInstallationCommand}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Panel>
             
-            <Button Content="Locate existing"
-                    Command="{Binding LocateExistingInstallationCommand}"
-                    Width="128" 
-                    HorizontalContentAlignment="Center" />
-            <Button Content="Install" 
-                    Width="90" 
-                    HorizontalContentAlignment="Center" 
-                    Classes="accent" />
-        </StackPanel>
+            <StackPanel Grid.Row="2" 
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right" 
+                        Spacing="10" 
+                        Margin="0,15,0,0">
+                
+                <Button Content="{x:Static lang:Resources.Installations_Locate}"
+                        Command="{Binding LocateExistingInstallationCommand}"
+                        Width="128" 
+                        HorizontalContentAlignment="Center" />
+                <Button Content="{x:Static lang:Resources.Installations_Install}"
+                        Width="90"
+                        Command="{Binding OpenInstallCommand}"
+                        HorizontalContentAlignment="Center" 
+                        Classes="accent" />
+            </StackPanel>
+        </Grid>
+
+        <Grid IsVisible="{Binding IsInstallModalOpen}">
+            <Border Background="#80000000" PointerPressed="OnInstallBackdropPointerPressed" />
+            
+            <dialogs:Install HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+
+        <Grid IsVisible="{Binding IsSettingsModalOpen}">
+            <Border Background="#80000000" PointerPressed="OnSettingsBackdropPointerPressed" />
+            <dialogs:InstallationSettingsWindow DataContext="{Binding SelectedInstallation}" 
+                                                HorizontalAlignment="Center" 
+                                                VerticalAlignment="Center" />
+        </Grid>
     </Grid>
 </UserControl>

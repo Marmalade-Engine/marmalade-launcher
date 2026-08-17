@@ -22,12 +22,16 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
+        <PackageReference Include="Xaml.Behaviors.Interactivity" Version="12.0.5" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Update="Assets\Localisation\Resources.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
+        <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Assets\Localisation\Resources.en-us.resx">
+        <DependentUpon>Resources.resx</DependentUpon>
       </EmbeddedResource>
     </ItemGroup>
 

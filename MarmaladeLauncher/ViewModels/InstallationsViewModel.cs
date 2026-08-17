@@ -27,6 +27,12 @@ public partial class InstallationsViewModel : ViewModelBase {
     [ObservableProperty]
     private bool _hasInstallations;
     
+    [ObservableProperty] 
+    private bool _isInstallModalOpen;
+    
+    [ObservableProperty] private bool _isSettingsModalOpen;
+    [ObservableProperty] private EngineInstallation? _selectedInstallation;
+    
     public InstallationsViewModel(InstallationService installService, SettingsService settingsService) {
         _installService = installService;
         _settingsService = settingsService;
@@ -239,17 +245,26 @@ public partial class InstallationsViewModel : ViewModelBase {
     }
 
     [RelayCommand]
-    private async Task OpenSettings(EngineInstallation item) {
+    private void OpenSettings(EngineInstallation item) {
         if (item == null) return;
+        SelectedInstallation = item;
+        IsSettingsModalOpen = true;
+    }
+    
+    [RelayCommand]
+    private async Task CloseSettings() {
+        IsSettingsModalOpen = false;
+        SelectedInstallation = null;
+        await _installService.SaveInstallations(Installations);
+    }
 
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
-            var dialog = new InstallationSettingsWindow {
-                DataContext = item
-            };
+    [RelayCommand]
+    private void OpenInstall() {
+        IsInstallModalOpen = true;
+    }
 
-            await dialog.ShowDialog(desktop.MainWindow);
-
-            await _installService.SaveInstallations(Installations);
-        }
+    [RelayCommand]
+    private void CloseInstall() {
+        IsInstallModalOpen = false;
     }
 }

@@ -6,12 +6,20 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MarmaladeLauncher.Assets.Localisation;
 using MarmaladeLauncher.Models;
 using MarmaladeLauncher.Services;
 
 namespace MarmaladeLauncher.ViewModels;
 
-public record PostLaunchOption(PostLaunchBehaviour Value, string DisplayName);
+public record PostLaunchOption(PostLaunchBehaviour Value) {
+    public string DisplayName => Value switch {
+        PostLaunchBehaviour.PostLaunchBehaviour_KEEPOPEN => Resources.Settings_PostLaunch_KeepOpen,
+        PostLaunchBehaviour.PostLaunchBehaviour_MINIMISE => Resources.Settings_PostLaunch_Minimise,
+        PostLaunchBehaviour.PostLaunchBehaviour_CLOSE => Resources.Settings_PostLaunch_Close,
+        _ => Value.ToString()
+    };
+}
 
 public partial class SettingsViewModel : ViewModelBase {
     private readonly SettingsService _settingsService;
@@ -33,11 +41,11 @@ public partial class SettingsViewModel : ViewModelBase {
 
     public string DefaultPathPlaceholder { get; } = SettingsService.DefaultBaseDirectory;
 
-    public List<PostLaunchOption> PostLaunchOptions { get; } = new() {
-        new(PostLaunchBehaviour.PostLaunchBehaviour_KEEPOPEN, "Keep launcher open"),
-        new(PostLaunchBehaviour.PostLaunchBehaviour_MINIMISE, "Minimise launcher"),
-        new(PostLaunchBehaviour.PostLaunchBehaviour_CLOSE, "Close launcher")
-    };
+    public List<PostLaunchOption> PostLaunchOptions { get; } = [
+        new(PostLaunchBehaviour.PostLaunchBehaviour_KEEPOPEN),
+        new(PostLaunchBehaviour.PostLaunchBehaviour_MINIMISE),
+        new(PostLaunchBehaviour.PostLaunchBehaviour_CLOSE)
+    ];
     
     public SettingsViewModel(SettingsService settingsService, LocalisationService localisationService) {
         _settingsService = settingsService;
@@ -57,6 +65,9 @@ public partial class SettingsViewModel : ViewModelBase {
     partial void OnSelectedLocaleChanged(LocalisationEntry.LanguageMetadata? value) {
         if (value != null && _localisationService != null) {
             _localisationService.CurrentLocale = value.LocaleKey;
+            
+            OnPropertyChanged(nameof(PostLaunchOptions));
+            OnPropertyChanged(nameof(Locales));
         }
         CheckDirtyState();
     }
@@ -84,7 +95,6 @@ public partial class SettingsViewModel : ViewModelBase {
     [RelayCommand]
     private void ResetToSaved() {
         var savedBehaviour = _settingsService.Settings.PostLaunchBehaviour;
-        
         var savedLocaleKey = _settingsService.Settings.CurrentLocale;
         
         DefaultInstallLocation = _settingsService.Settings.DefaultInstallLocation;
@@ -121,7 +131,7 @@ public partial class SettingsViewModel : ViewModelBase {
             PostLaunchBehaviour = SelectedPostLaunchOption.Value,
             CurrentLocale = _selectedLocale?.LocaleKey ?? "en-GB"
         };
-
+        
         await _settingsService.SaveSettings(updatedSettings);
         IsDirty = false;
     }
