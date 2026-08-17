@@ -1,0 +1,5 @@
+name: marmalade-launcher
+version: ~
+title: Marmalade Launcher
+nav:
+  - modules/ROOT/nav.adoc
