@@ -117,6 +117,12 @@ namespace MarmaladeLauncher.Assets.Localisation {
             }
         }
         
+        public static string Installations_FilterDevBuilds {
+            get {
+                return ResourceManager.GetString("Installations.FilterDevBuilds", resourceCulture);
+            }
+        }
+        
         public static string Modal_Installation_Settings {
             get {
                 return ResourceManager.GetString("Modal.Installation.Settings", resourceCulture);
@@ -210,6 +216,12 @@ namespace MarmaladeLauncher.Assets.Localisation {
         public static string Settings_PostLaunch_Close {
             get {
                 return ResourceManager.GetString("Settings.PostLaunch_Close", resourceCulture);
+            }
+        }
+        
+        public static string Settings_EnableDevBuilds {
+            get {
+                return ResourceManager.GetString("Settings.EnableDevBuilds", resourceCulture);
             }
         }
         

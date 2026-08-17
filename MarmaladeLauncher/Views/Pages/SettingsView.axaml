@@ -8,45 +8,47 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MarmaladeLauncher.Views.Pages.SettingsView"
              x:DataType="vm:SettingsViewModel">
-    
+
     <Grid RowDefinitions="*, Auto" Margin="20">
         <StackPanel Grid.Row="0" Spacing="20">
-            <TextBlock FontSize="22" FontWeight="Bold" Text="{x:Static lang:Resources.Settings_Header}"/>
+            <TextBlock FontSize="22" FontWeight="Bold" Text="{x:Static lang:Resources.Settings_Header}" />
 
             <StackPanel Spacing="10">
-                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{x:Static lang:Resources.Settings_EngineSettings}"/>
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{x:Static lang:Resources.Settings_EngineSettings}" />
 
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <TextBlock Text="{x:Static lang:Resources.Settings_DefaultEngineInstallPath}"
-                               FontSize="14" 
+                               FontSize="14"
                                VerticalAlignment="Center" />
-                           
-                    <TextBox Text="{Binding DefaultInstallLocation, Mode=TwoWay}" 
+
+                    <TextBox Text="{Binding DefaultInstallLocation, Mode=TwoWay}"
                              PlaceholderText="{Binding DefaultPathPlaceholder}"
-                             AcceptsReturn="False" 
+                             AcceptsReturn="False"
                              Height="35"
-                             Width="380" 
+                             Width="380"
                              VerticalAlignment="Center" />
-                    
+
                     <Button Content="{x:Static lang:Resources.Settings_BrowsePrompt}"
                             Command="{Binding BrowseFolderCommand}"
-                            VerticalAlignment="Center"/>
+                            VerticalAlignment="Center" />
 
                     <Button Content="{x:Static lang:Resources.Settings_ResetPath}"
                             Command="{Binding ResetToDefaultCommand}"
                             ToolTip.Tip="{x:Static lang:Resources.Settings_ResetPathTooltip}"
-                            VerticalAlignment="Center"/>
+                            VerticalAlignment="Center" />
                 </StackPanel>
             </StackPanel>
 
             <Separator Background="{DynamicResource SystemControlForegroundBaseLowBrush}" />
 
             <StackPanel Spacing="10">
-                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{x:Static lang:Resources.Settings_LauncherSettings}"/>
+                <TextBlock FontSize="18" FontWeight="SemiBold"
+                           Text="{x:Static lang:Resources.Settings_LauncherSettings}" />
 
                 <StackPanel Orientation="Horizontal" Spacing="15">
-                    <TextBlock Text="{x:Static lang:Resources.Settings_PostLaunchBehaviour}" 
-                               FontSize="14" 
+                    <TextBlock Text="{x:Static lang:Resources.Settings_PostLaunchBehaviour}"
+                               FontSize="14"
+                               Width="180"
                                VerticalAlignment="Center" />
 
                     <ComboBox ItemsSource="{Binding PostLaunchOptions}"
@@ -55,22 +57,22 @@
                               Width="220"
                               VerticalAlignment="Center" />
                 </StackPanel>
-                
+
                 <StackPanel Orientation="Horizontal" Spacing="15">
                     <TextBlock Text="{x:Static lang:Resources.Settings_Language}"
                                FontSize="14"
-                               VerticalAlignment="Center"/>
+                               Width="180"
+                               VerticalAlignment="Center" />
 
                     <ComboBox ItemsSource="{Binding Locales}"
                               SelectedItem="{Binding SelectedLocale, Mode=TwoWay}"
-                              Width="260"
+                              Width="220"
                               VerticalAlignment="Center">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="m:LocalisationEntry+LanguageMetadata">
                                 <StackPanel Orientation="Horizontal" Spacing="5">
-                                    <TextBlock Text="{Binding DisplayName}"/>
-
-                                    <TextBlock Text="{Binding StatusSuffix}" 
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                    <TextBlock Text="{Binding StatusSuffix}"
                                                FontStyle="Italic"
                                                FontSize="12"
                                                Opacity="0.6"
@@ -81,22 +83,34 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="15">
+                    <TextBlock Text="{x:Static lang:Resources.Settings_EnableDevBuilds}"
+                               FontSize="14"
+                               Width="180"
+                               VerticalAlignment="Center" />
+
+                    <ToggleSwitch IsChecked="{Binding EnableDevBuilds, Mode=TwoWay}"
+                                  OffContent=""
+                                  OnContent=""
+                                  VerticalAlignment="Center" />
+                </StackPanel>
             </StackPanel>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right" 
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
                     Spacing="10"
                     IsVisible="{Binding IsDirty}">
-            <Button Content="{x:Static lang:Resources.Settings_CancelChanges}" 
+            <Button Content="{x:Static lang:Resources.Settings_CancelChanges}"
                     Command="{Binding CancelCommand}"
-                    Width="90" 
+                    Width="90"
                     HorizontalContentAlignment="Center" />
-            <Button Content="{x:Static lang:Resources.Settings_SaveSettings}" 
-                    Command="{Binding SaveCommand}" 
-                    Width="90" 
-                    HorizontalContentAlignment="Center" 
+            <Button Content="{x:Static lang:Resources.Settings_SaveSettings}"
+                    Command="{Binding SaveCommand}"
+                    Width="90"
+                    HorizontalContentAlignment="Center"
                     Classes="accent" />
         </StackPanel>
     </Grid>

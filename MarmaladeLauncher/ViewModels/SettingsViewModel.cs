@@ -46,7 +46,10 @@ public partial class SettingsViewModel : ViewModelBase {
         new(PostLaunchBehaviour.PostLaunchBehaviour_MINIMISE),
         new(PostLaunchBehaviour.PostLaunchBehaviour_CLOSE)
     ];
-    
+
+    [ObservableProperty]
+    private bool _enableDevBuilds;
+
     public SettingsViewModel(SettingsService settingsService, LocalisationService localisationService) {
         _settingsService = settingsService;
         _localisationService = localisationService;
@@ -62,6 +65,8 @@ public partial class SettingsViewModel : ViewModelBase {
     
     partial void OnSelectedPostLaunchOptionChanged(PostLaunchOption value) => CheckDirtyState();
 
+    partial void OnEnableDevBuildsChanged(bool value) => CheckDirtyState();
+    
     partial void OnSelectedLocaleChanged(LocalisationEntry.LanguageMetadata? value) {
         if (value != null && _localisationService != null) {
             _localisationService.CurrentLocale = value.LocaleKey;
@@ -78,8 +83,9 @@ public partial class SettingsViewModel : ViewModelBase {
         bool isLocationDirty = DefaultInstallLocation != _settingsService.Settings.DefaultInstallLocation;
         bool isBehaviorDirty = SelectedPostLaunchOption?.Value != _settingsService.Settings.PostLaunchBehaviour;
         bool isLocaleDirty = _selectedLocale?.LocaleKey != _settingsService.Settings.CurrentLocale;
+        bool isDevBuildsDirty = EnableDevBuilds != _settingsService.Settings.EnableDevBuilds;
         
-        IsDirty = isLocationDirty || isBehaviorDirty || isLocaleDirty;
+        IsDirty = isLocationDirty || isBehaviorDirty || isLocaleDirty || isDevBuildsDirty;
     }
 
     [RelayCommand]
@@ -105,6 +111,8 @@ public partial class SettingsViewModel : ViewModelBase {
         SelectedLocale = Locales.FirstOrDefault(l => l.LocaleKey == savedLocaleKey) 
                          ?? Locales.FirstOrDefault(l => l.LocaleKey == "en-GB");
     
+        EnableDevBuilds = _settingsService.Settings.EnableDevBuilds;
+        
         IsDirty = false;
     }
 
@@ -129,7 +137,8 @@ public partial class SettingsViewModel : ViewModelBase {
         var updatedSettings = new LauncherSettings {
             DefaultInstallLocation = DefaultInstallLocation,
             PostLaunchBehaviour = SelectedPostLaunchOption.Value,
-            CurrentLocale = _selectedLocale?.LocaleKey ?? "en-GB"
+            CurrentLocale = _selectedLocale?.LocaleKey ?? "en-GB",
+            EnableDevBuilds = EnableDevBuilds
         };
         
         await _settingsService.SaveSettings(updatedSettings);

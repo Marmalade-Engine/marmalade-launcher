@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json.Nodes;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -14,7 +16,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MarmaladeLauncher.Models;
 using MarmaladeLauncher.Services;
-using MarmaladeLauncher.Views.Dialogs;
 
 namespace MarmaladeLauncher.ViewModels;
 
@@ -22,33 +23,67 @@ public partial class InstallationsViewModel : ViewModelBase {
     private readonly InstallationService _installService;
     private readonly SettingsService _settingsService;
 
+    private List<EngineInstallation> _allAvailableEngineInstallations = new();
+    
     [ObservableProperty] private ObservableCollection<EngineInstallation> _installations = new();
-    
-    [ObservableProperty]
-    private bool _hasInstallations;
-    
-    [ObservableProperty] 
-    private bool _isInstallModalOpen;
-    
+
+    [ObservableProperty] private ObservableCollection<EngineInstallation> _engineInstallations = new();
+
+    [ObservableProperty] private bool _hasInstallations;
+
+    [ObservableProperty] private bool _engineVersionsAvailable = true;
+
+    [ObservableProperty] private bool _isInstallModalOpen;
+
     [ObservableProperty] private bool _isSettingsModalOpen;
     [ObservableProperty] private EngineInstallation? _selectedInstallation;
-    
+
+    [ObservableProperty] private EngineInstallation? _selectedEngineToInstall;
+
+    [ObservableProperty] private bool _allowDevBuilds;
+
+    [ObservableProperty] private bool _showDevBuilds = true;
+
+    private string _engineDownloadsURI =
+        "https://www.ryanbester.com/download?product=marmalade-engine&branch=dev&platform=windows&list";
+
     public InstallationsViewModel(InstallationService installService, SettingsService settingsService) {
         _installService = installService;
         _settingsService = settingsService;
+    
+        _settingsService.LoadSettings();
+        AllowDevBuilds = _settingsService.Settings.EnableDevBuilds;
+    
         _ = LoadData();
     }
 
-    public InstallationsViewModel() : this(new InstallationService(), new SettingsService()) { }        
-    
+    public InstallationsViewModel() : this(new InstallationService(), CreateAndLoadSettingsService()) { }
+
+    private static SettingsService CreateAndLoadSettingsService() {
+        var service = new SettingsService();
+        service.LoadSettings();
+        return service;
+    }
+
     private async Task LoadData() {
         var list = await _installService.LoadInstallations();
         Installations = new ObservableCollection<EngineInstallation>(list);
+        
+        _allAvailableEngineInstallations = await FetchEngineVersions();
+        
+        ApplyEngineFilter();
+        
         UpdateState();
+    }
+    
+    partial void OnShowDevBuildsChanged(bool value) {
+        ApplyEngineFilter();
     }
 
     private void UpdateState() {
         HasInstallations = Installations.Count > 0;
+        EngineVersionsAvailable = EngineInstallations.Count > 0;
+        AllowDevBuilds = _settingsService.Settings.EnableDevBuilds;
     }
 
     [RelayCommand]
@@ -64,7 +99,8 @@ public partial class InstallationsViewModel : ViewModelBase {
                     AppleUniformTypeIdentifiers = new[] { "com.apple.application-bundle", "com.apple.executable" },
                     Patterns = new[] { "*.app" }
                 });
-            } else {
+            }
+            else {
                 fileTypes.Add(new FilePickerFileType("Executables") {
                     Patterns = new[] { "*.exe", "*.AppImage", "*.appimage" },
                     MimeTypes = new[] { "application/x-executable", "application/x-appimage" }
@@ -108,7 +144,7 @@ public partial class InstallationsViewModel : ViewModelBase {
         var newEngine = new EngineInstallation {
             Name = displayName,
             ExecutablePath = executablePath,
-            DateAdded = DateTime.Now
+            DateAdded = DateTime.Now,
         };
 
         Installations.Add(newEngine);
@@ -123,7 +159,7 @@ public partial class InstallationsViewModel : ViewModelBase {
 
         Installations.Remove(item);
         UpdateState();
-        
+
         await _installService.SaveInstallations(Installations);
     }
 
@@ -165,7 +201,7 @@ public partial class InstallationsViewModel : ViewModelBase {
         string workingDir = Path.GetDirectoryName(item.ExecutablePath) ?? string.Empty;
         string appBundlePath = GetMacAppBundlePath(item.ExecutablePath);
 
-        if (!string.IsNullOrEmpty(appBundlePath)) { 
+        if (!string.IsNullOrEmpty(appBundlePath)) {
             var args = $"-n \"{appBundlePath}\"";
             if (!string.IsNullOrWhiteSpace(item.Arguments)) {
                 args += $" --args {item.Arguments}";
@@ -221,7 +257,7 @@ public partial class InstallationsViewModel : ViewModelBase {
 
     private async Task ExecutePostLaunchBehaviorAsync() {
         _settingsService.LoadSettings();
-        
+
         var behavior = _settingsService.Settings.PostLaunchBehaviour;
 
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
@@ -230,6 +266,7 @@ public partial class InstallationsViewModel : ViewModelBase {
                     if (desktop.MainWindow != null) {
                         desktop.MainWindow.WindowState = WindowState.Minimized;
                     }
+
                     break;
 
                 case PostLaunchBehaviour.PostLaunchBehaviour_CLOSE:
@@ -250,7 +287,7 @@ public partial class InstallationsViewModel : ViewModelBase {
         SelectedInstallation = item;
         IsSettingsModalOpen = true;
     }
-    
+
     [RelayCommand]
     private async Task CloseSettings() {
         IsSettingsModalOpen = false;
@@ -260,11 +297,60 @@ public partial class InstallationsViewModel : ViewModelBase {
 
     [RelayCommand]
     private void OpenInstall() {
+        _settingsService.LoadSettings();
+        AllowDevBuilds = _settingsService.Settings.EnableDevBuilds;
+        ApplyEngineFilter();
+    
         IsInstallModalOpen = true;
     }
 
     [RelayCommand]
     private void CloseInstall() {
         IsInstallModalOpen = false;
+    }
+
+    private async Task<List<EngineInstallation>> FetchEngineVersions() {
+        try {
+            using (var client = new HttpClient()) {
+                client.Timeout = TimeSpan.FromSeconds(10);
+
+                string response = await client.GetStringAsync(_engineDownloadsURI);
+                var installations = new List<EngineInstallation>();
+                var data = JsonNode.Parse(response);
+
+                if (data is JsonObject jsonObject && jsonObject["builds"] is JsonArray buildsArray) {
+                    foreach (var item in buildsArray) {
+                        string url = item["url"]?.ToString() ?? string.Empty;
+
+                        string branch = "release";
+                        if (url.Contains("branch=dev", StringComparison.OrdinalIgnoreCase)) {
+                            branch = "dev";
+                        }
+
+                        var installation = new EngineInstallation() {
+                            Name = item["id"]?.ToString() ?? "Unknown",
+                            Version = item["id"]?.ToString() ?? "0.0.0",
+                            InstallSize = int.Parse(item["size"]?.ToString() ?? "0"),
+                            Branch = branch
+                        };
+                        installations.Add(installation);
+                    }
+                }
+
+                return installations;
+            }
+        }
+        catch (Exception) {
+            return new List<EngineInstallation>();
+        }
+    }
+
+    private void ApplyEngineFilter() {
+        var filteredList = _allAvailableEngineInstallations
+            .Where(x => (AllowDevBuilds && ShowDevBuilds) || !x.Branch.Equals("dev", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        EngineInstallations = new ObservableCollection<EngineInstallation>(filteredList);
+        EngineVersionsAvailable = EngineInstallations.Count > 0;
     }
 }

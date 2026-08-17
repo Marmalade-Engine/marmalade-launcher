@@ -3,21 +3,68 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:MarmaladeLauncher.ViewModels"
+             xmlns:m="clr-namespace:MarmaladeLauncher.Models"
+             xmlns:lang="clr-namespace:MarmaladeLauncher.Assets.Localisation"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="vm:InstallationsViewModel"
              x:Class="MarmaladeLauncher.Views.Dialogs.Install">
     <Border Background="White" 
             CornerRadius="8" 
             Padding="20" 
             HorizontalAlignment="Center" 
             VerticalAlignment="Center" 
-            MinWidth="400">
-        <StackPanel Spacing="15">
-            <TextBlock Text="Install Options" FontSize="18" FontWeight="Bold" />
-            <TextBlock Text="Welcome to Avalonia!" />
+            MinWidth="400"
+            MaxHeight="600">
+        
+        <Grid RowDefinitions="Auto, *, Auto">
             
-            <Button Content="Close" 
-                    HorizontalAlignment="Right" 
-                    Command="{Binding $parent[UserControl;1].((vm:InstallationsViewModel)DataContext).CloseInstallCommand}" />
-        </StackPanel>
+            <TextBlock Grid.Row="0" 
+                       Text="New Install" 
+                       FontSize="18" 
+                       FontWeight="Bold" 
+                       Margin="0,0,0,15"/>
+            
+            <Panel Grid.Row="1" Margin="0,0,0,15">
+                <TextBlock Text="There are no installs available. Please try again later"
+                           FontSize="18"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding !EngineVersionsAvailable}"/>
+                
+                <ScrollViewer IsVisible="{Binding EngineVersionsAvailable}">
+                    <ItemsControl ItemsSource="{Binding EngineInstallations}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="m:EngineInstallation">
+                                <Border Margin="0,0,0,8" 
+                                        Padding="12" 
+                                        Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" 
+                                        CornerRadius="6">
+                                
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="{Binding Version}"
+                                                       FontWeight="Bold"
+                                                       FontSize="16"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Panel>
+            
+            <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
+                <CheckBox Grid.Column="0"
+                          Content="{x:Static lang:Resources.Installations_FilterDevBuilds}"
+                          IsChecked="{Binding ShowDevBuilds, Mode=TwoWay}"
+                          VerticalAlignment="Center"
+                          IsVisible="{Binding AllowDevBuilds}"/>
+                
+                <Button Grid.Column="1" 
+                        Content="Close" 
+                        Command="{Binding $parent[UserControl;1].((vm:InstallationsViewModel)DataContext).CloseInstallCommand}" />
+            </Grid>
+        </Grid>
     </Border>
 </UserControl>
