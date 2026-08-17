@@ -44,8 +44,8 @@ public partial class InstallationsViewModel : ViewModelBase {
 
     [ObservableProperty] private bool _showDevBuilds = true;
     
-    private string _engineDownloadsURI =
-        "https://www.ryanbester.com/download?product=marmalade-engine&branch=dev&platform=windows&list";
+    private string EngineDownloadsURI =>
+        $"https://www.ryanbester.com/download?product=marmalade-engine&branch=dev&platform={GetCurrentPlatform()}&list";
 
     public InstallationsViewModel(InstallationService installService, SettingsService settingsService) {
         _installService = installService;
@@ -314,23 +314,32 @@ public partial class InstallationsViewModel : ViewModelBase {
             using (var client = new HttpClient()) {
                 client.Timeout = TimeSpan.FromSeconds(10);
 
-                string response = await client.GetStringAsync(_engineDownloadsURI);
+                string response = await client.GetStringAsync(EngineDownloadsURI);
                 var installations = new List<EngineInstallation>();
                 var data = JsonNode.Parse(response);
 
                 if (data is JsonObject jsonObject && jsonObject["builds"] is JsonArray buildsArray) {
+                    string currentPlatform = GetCurrentPlatform();
+                    
                     foreach (var item in buildsArray) {
                         string url = item["url"]?.ToString() ?? string.Empty;
 
+                        if (!string.IsNullOrEmpty(url) && 
+                            !url.Contains($"platform={currentPlatform}", StringComparison.OrdinalIgnoreCase)) {
+                            continue;
+                        }
+                        
                         string branch = "release";
                         if (url.Contains("branch=dev", StringComparison.OrdinalIgnoreCase)) {
                             branch = "dev";
                         }
 
+                        long.TryParse(item["size"]?.ToString(), out long parsedSize);
+
                         var installation = new EngineInstallation() {
                             Name = item["id"]?.ToString() ?? "Unknown",
-                            Version = item["id"]?.ToString() ?? "0.0.0",
-                            InstallSize = int.Parse(item["size"]?.ToString() ?? "0"),
+                            Version = item["version"]?.ToString() ?? "0.0.0",
+                            InstallSize = parsedSize,
                             Branch = branch
                         };
                         installations.Add(installation);
@@ -356,5 +365,13 @@ public partial class InstallationsViewModel : ViewModelBase {
         if (SelectedEngineToInstall != null && !EngineInstallations.Contains(SelectedEngineToInstall)) {
             SelectedEngineToInstall = null;
         }
+        
+    }
+
+    private static string GetCurrentPlatform() {
+        if (OperatingSystem.IsWindows()) return "windows";
+        if (OperatingSystem.IsMacOS()) return "macos-arm";
+        if (OperatingSystem.IsLinux()) return "linux";
+        return "windows";
     }
 }

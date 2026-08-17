@@ -65,7 +65,7 @@
                     <StackPanel Spacing="8">
                         <TextBlock Text="{Binding SelectedEngineToInstall.Name}" FontSize="18" FontWeight="Bold" />
                         <TextBlock Text="{Binding SelectedEngineToInstall.Version, StringFormat='Version: {0}'}" />
-                        <TextBlock Text="{Binding SelectedEngineToInstall.InstallSize, StringFormat='Size: {0} MB'}" />
+                        <TextBlock Text="{Binding SelectedEngineToInstall.FormattedInstallSize, StringFormat='Size: {0}'}" />
                         <TextBlock Text="{Binding SelectedEngineToInstall.Branch, StringFormat='Branch: {0}'}" />
                     </StackPanel>
                 </Border>
@@ -76,7 +76,7 @@
                         Background="{DynamicResource SystemControlBackgroundChromeLowBrush}"
                         CornerRadius="6"
                         IsVisible="{Binding SelectedEngineToInstall, Converter={x:Static ObjectConverters.IsNull}}">
-                    <TextBlock Text="Select an installation from the list to view details."
+                    <TextBlock Text="Select an installation from the list to view details"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
