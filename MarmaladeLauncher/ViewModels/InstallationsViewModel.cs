@@ -365,7 +365,6 @@ public partial class InstallationsViewModel : ViewModelBase {
         if (SelectedEngineToInstall != null && !EngineInstallations.Contains(SelectedEngineToInstall)) {
             SelectedEngineToInstall = null;
         }
-        
     }
 
     private static string GetCurrentPlatform() {

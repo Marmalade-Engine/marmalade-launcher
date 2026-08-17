@@ -81,7 +81,6 @@
                                HorizontalAlignment="Center"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                 </Border>
-
             </Grid>
 
             <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
