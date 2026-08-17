@@ -8,61 +8,91 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="vm:InstallationsViewModel"
              x:Class="MarmaladeLauncher.Views.Dialogs.Install">
-    <Border Background="White" 
-            CornerRadius="8" 
-            Padding="20" 
-            HorizontalAlignment="Center" 
-            VerticalAlignment="Center" 
-            MinWidth="400"
+    
+    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+            CornerRadius="8"
+            Padding="20"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            MinWidth="700"
             MaxHeight="600">
         
         <Grid RowDefinitions="Auto, *, Auto">
-            
-            <TextBlock Grid.Row="0" 
-                       Text="New Install" 
-                       FontSize="18" 
-                       FontWeight="Bold" 
-                       Margin="0,0,0,15"/>
-            
-            <Panel Grid.Row="1" Margin="0,0,0,15">
-                <TextBlock Text="There are no installs available. Please try again later"
-                           FontSize="18"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           IsVisible="{Binding !EngineVersionsAvailable}"/>
-                
-                <ScrollViewer IsVisible="{Binding EngineVersionsAvailable}">
-                    <ItemsControl ItemsSource="{Binding EngineInstallations}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="m:EngineInstallation">
-                                <Border Margin="0,0,0,8" 
-                                        Padding="12" 
-                                        Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" 
-                                        CornerRadius="6">
-                                
-                                    <Grid ColumnDefinitions="*, Auto">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <TextBlock Text="{Binding Version}"
-                                                       FontWeight="Bold"
-                                                       FontSize="16"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </Panel>
-            
+
+            <TextBlock Grid.Row="0"
+                       Text="New Install"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Margin="0,0,0,15" />
+
+            <TextBlock Grid.Row="1"
+                       Text="There are no installs available. Please try again later"
+                       FontSize="18"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Margin="0,0,0,15"
+                       IsVisible="{Binding !EngineVersionsAvailable}" />
+
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="1*, 2*"
+                  Margin="0,0,0,15"
+                  IsVisible="{Binding EngineVersionsAvailable}">
+
+                <ListBox Grid.Column="0"
+                         Margin="0,0,10,0"
+                         ItemsSource="{Binding EngineInstallations}"
+                         SelectedItem="{Binding SelectedEngineToInstall, Mode=TwoWay}"
+                         Background="Transparent">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="m:EngineInstallation">
+                            <Grid ColumnDefinitions="*, Auto">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{Binding Version}"
+                                               FontWeight="Bold"
+                                               FontSize="16" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Border Grid.Column="1"
+                        Margin="10,0,0,0"
+                        Padding="12"
+                        Background="{DynamicResource SystemControlBackgroundChromeLowBrush}"
+                        CornerRadius="6"
+                        IsVisible="{Binding SelectedEngineToInstall, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="{Binding SelectedEngineToInstall.Name}" FontSize="18" FontWeight="Bold" />
+                        <TextBlock Text="{Binding SelectedEngineToInstall.Version, StringFormat='Version: {0}'}" />
+                        <TextBlock Text="{Binding SelectedEngineToInstall.InstallSize, StringFormat='Size: {0} MB'}" />
+                        <TextBlock Text="{Binding SelectedEngineToInstall.Branch, StringFormat='Branch: {0}'}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1"
+                        Margin="10,0,0,0"
+                        Padding="12"
+                        Background="{DynamicResource SystemControlBackgroundChromeLowBrush}"
+                        CornerRadius="6"
+                        IsVisible="{Binding SelectedEngineToInstall, Converter={x:Static ObjectConverters.IsNull}}">
+                    <TextBlock Text="Select an installation from the list to view details."
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                </Border>
+
+            </Grid>
+
             <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
                 <CheckBox Grid.Column="0"
                           Content="{x:Static lang:Resources.Installations_FilterDevBuilds}"
                           IsChecked="{Binding ShowDevBuilds, Mode=TwoWay}"
                           VerticalAlignment="Center"
-                          IsVisible="{Binding AllowDevBuilds}"/>
-                
-                <Button Grid.Column="1" 
-                        Content="Close" 
+                          IsVisible="{Binding AllowDevBuilds}" />
+
+                <Button Grid.Column="1"
+                        Content="Close"
                         Command="{Binding $parent[UserControl;1].((vm:InstallationsViewModel)DataContext).CloseInstallCommand}" />
             </Grid>
         </Grid>

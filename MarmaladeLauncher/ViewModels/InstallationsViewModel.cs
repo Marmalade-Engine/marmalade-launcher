@@ -43,7 +43,7 @@ public partial class InstallationsViewModel : ViewModelBase {
     [ObservableProperty] private bool _allowDevBuilds;
 
     [ObservableProperty] private bool _showDevBuilds = true;
-
+    
     private string _engineDownloadsURI =
         "https://www.ryanbester.com/download?product=marmalade-engine&branch=dev&platform=windows&list";
 
@@ -306,6 +306,7 @@ public partial class InstallationsViewModel : ViewModelBase {
     [RelayCommand]
     private void CloseInstall() {
         IsInstallModalOpen = false;
+        SelectedEngineToInstall = null;
     }
 
     private async Task<List<EngineInstallation>> FetchEngineVersions() {
@@ -351,5 +352,9 @@ public partial class InstallationsViewModel : ViewModelBase {
 
         EngineInstallations = new ObservableCollection<EngineInstallation>(filteredList);
         EngineVersionsAvailable = EngineInstallations.Count > 0;
+
+        if (SelectedEngineToInstall != null && !EngineInstallations.Contains(SelectedEngineToInstall)) {
+            SelectedEngineToInstall = null;
+        }
     }
 }
