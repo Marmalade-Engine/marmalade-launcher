@@ -96,8 +96,7 @@ public partial class InstallationsViewModel : ViewModelBase {
 
             if (OperatingSystem.IsMacOS()) {
                 fileTypes.Add(new FilePickerFileType("macOS Applications") {
-                    AppleUniformTypeIdentifiers = new[] { "com.apple.application-bundle", "com.apple.executable" },
-                    Patterns = new[] { "*.app" }
+                    AppleUniformTypeIdentifiers = new[] { "com.apple.application-bundle", "com.apple.executable" }
                 });
             }
             else {
