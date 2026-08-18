@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using MarmaladeLauncher.Assets.Localisation;
+using Common.Assets.Localisation;
+using Common.Assets.Localisation;
 
 namespace MarmaladeLauncher.Models;
 

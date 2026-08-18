@@ -1,8 +1,5 @@
 using System;
-using System.Diagnostics;
 using System.Globalization;
-using Avalonia.Media;
-using MarmaladeLauncher.Views;
 
 namespace MarmaladeLauncher.Services;
 
@@ -38,9 +35,5 @@ public class LocalisationService {
 
     private void SyncLocale() {
         CurrentLocale = _settingsService.Settings.CurrentLocale;
-    }
-
-    public void ToggleRTL(Avalonia.Controls.Window w, bool isRTL) {
-        w.FlowDirection = isRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
     }
 }

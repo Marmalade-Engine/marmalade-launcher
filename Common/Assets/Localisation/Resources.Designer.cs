@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MarmaladeLauncher.Assets.Localisation {
+namespace Common.Assets.Localisation {
     using System;
     
     
@@ -24,11 +24,14 @@ namespace MarmaladeLauncher.Assets.Localisation {
         internal Resources() {
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static System.Resources.ResourceManager ResourceManager {
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
-                if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("MarmaladeLauncher.Assets.Localisation.Resources", typeof(Resources).Assembly);
+                if (object.ReferenceEquals(resourceMan, null)) {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager(
+                        "MarmaladeLauncher.Common.Assets.Localisation.Resources", 
+                        typeof(Resources).Assembly
+                    );
                     resourceMan = temp;
                 }
                 return resourceMan;

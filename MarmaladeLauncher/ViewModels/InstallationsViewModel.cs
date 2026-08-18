@@ -22,6 +22,7 @@ namespace MarmaladeLauncher.ViewModels;
 public partial class InstallationsViewModel : ViewModelBase {
     private readonly InstallationService _installService;
     private readonly SettingsService _settingsService;
+    private readonly LaunchService _launchService;
 
     private List<EngineInstallation> _allAvailableEngineInstallations = new();
     
@@ -47,9 +48,10 @@ public partial class InstallationsViewModel : ViewModelBase {
     private string EngineDownloadsURI =>
         $"https://www.ryanbester.com/download?product=marmalade-engine&branch=dev&platform={GetCurrentPlatform()}&list";
 
-    public InstallationsViewModel(InstallationService installService, SettingsService settingsService) {
+    public InstallationsViewModel(InstallationService installService, SettingsService settingsService, LaunchService launchService) {
         _installService = installService;
         _settingsService = settingsService;
+        _launchService = launchService;
     
         _settingsService.LoadSettings();
         AllowDevBuilds = _settingsService.Settings.EnableDevBuilds;
@@ -57,7 +59,7 @@ public partial class InstallationsViewModel : ViewModelBase {
         _ = LoadData();
     }
 
-    public InstallationsViewModel() : this(new InstallationService(), CreateAndLoadSettingsService()) { }
+    public InstallationsViewModel() : this(new InstallationService(), CreateAndLoadSettingsService(), new LaunchService(CreateAndLoadSettingsService())) { }
 
     private static SettingsService CreateAndLoadSettingsService() {
         var service = new SettingsService();
@@ -164,78 +166,9 @@ public partial class InstallationsViewModel : ViewModelBase {
 
     [RelayCommand]
     private async Task LaunchInstallation(EngineInstallation item) {
-        if (item == null || string.IsNullOrWhiteSpace(item.ExecutablePath))
-            return;
+        if (item == null) return;
 
-        try {
-            ProcessStartInfo startInfo;
-
-            if (OperatingSystem.IsMacOS()) {
-                startInfo = CreateMacDetachedStartInfo(item);
-            }
-            else if (OperatingSystem.IsLinux()) {
-                startInfo = CreateLinuxDetachedStartInfo(item);
-            }
-            else {
-                startInfo = new ProcessStartInfo {
-                    FileName = item.ExecutablePath,
-                    Arguments = item.Arguments ?? string.Empty,
-                    UseShellExecute = true,
-                    WorkingDirectory = Path.GetDirectoryName(item.ExecutablePath) ?? string.Empty
-                };
-            }
-
-            using (var process = Process.Start(startInfo)) {
-                Console.WriteLine($"[Launch] Detached process started for '{item.Name}' with args: '{item.Arguments}'");
-            }
-
-            await ExecutePostLaunchBehaviorAsync();
-        }
-        catch (Exception e) {
-            Console.WriteLine($"[Launch] Error launching executable: {e.Message}");
-        }
-    }
-
-    private ProcessStartInfo CreateMacDetachedStartInfo(EngineInstallation item) {
-        string workingDir = Path.GetDirectoryName(item.ExecutablePath) ?? string.Empty;
-        string appBundlePath = GetMacAppBundlePath(item.ExecutablePath);
-
-        if (!string.IsNullOrEmpty(appBundlePath)) {
-            var args = $"-n \"{appBundlePath}\"";
-            if (!string.IsNullOrWhiteSpace(item.Arguments)) {
-                args += $" --args {item.Arguments}";
-            }
-
-            return new ProcessStartInfo {
-                FileName = "/usr/bin/open",
-                Arguments = args,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                WorkingDirectory = workingDir
-            };
-        }
-
-        string binaryArgs = string.IsNullOrWhiteSpace(item.Arguments) ? "" : $" {item.Arguments}";
-        return new ProcessStartInfo {
-            FileName = "/bin/zsh",
-            Arguments = $"-c \"nohup '{item.ExecutablePath}'{binaryArgs} > /dev/null 2>&1 &\"",
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            WorkingDirectory = workingDir
-        };
-    }
-
-    private ProcessStartInfo CreateLinuxDetachedStartInfo(EngineInstallation item) {
-        string workingDir = Path.GetDirectoryName(item.ExecutablePath) ?? string.Empty;
-        string binaryArgs = string.IsNullOrWhiteSpace(item.Arguments) ? "" : $" {item.Arguments}";
-
-        return new ProcessStartInfo {
-            FileName = "/bin/bash",
-            Arguments = $"-c \"nohup '{item.ExecutablePath}'{binaryArgs} > /dev/null 2>&1 &\"",
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            WorkingDirectory = workingDir
-        };
+        await _launchService.LaunchAsync(item, onPostLaunch: ExecutePostLaunchBehaviorAsync);
     }
 
     private string GetMacAppBundlePath(string executablePath) {

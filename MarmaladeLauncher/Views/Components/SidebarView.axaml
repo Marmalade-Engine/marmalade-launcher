@@ -3,7 +3,7 @@
              xmlns:vm="using:MarmaladeLauncher.ViewModels"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:lang="clr-namespace:MarmaladeLauncher.Assets.Localisation"
+             xmlns:localisation="clr-namespace:Common.Assets.Localisation;assembly=MarmaladeLauncher.Common"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MarmaladeLauncher.Views.Components.SidebarView"
              x:DataType="vm:MainViewModel">
@@ -11,17 +11,17 @@
     <Grid RowDefinitions="*, Auto" Margin="8">
         
         <StackPanel Grid.Row="0" Spacing="8">
-            <Button Content="{x:Static lang:Resources.Toolbar_Projects}"
+            <Button Content="{x:Static localisation:Resources.Toolbar_Projects}"
                     Command="{Binding OpenProjectsCommand}"
                     HorizontalAlignment="Stretch" />
             
-            <Button Content="{x:Static lang:Resources.Toolbar_Installations}"
+            <Button Content="{x:Static localisation:Resources.Toolbar_Installations}"
                     Command="{Binding OpenInstallationsCommand}"
                     HorizontalAlignment="Stretch" />
         </StackPanel>
 
         <StackPanel Grid.Row="1" Spacing="8">
-            <Button Content="{x:Static lang:Resources.Toolbar_Settings}"
+            <Button Content="{x:Static localisation:Resources.Toolbar_Settings}"
                     Command="{Binding OpenSettingsCommand}"
                     HorizontalAlignment="Stretch" />
         </StackPanel>

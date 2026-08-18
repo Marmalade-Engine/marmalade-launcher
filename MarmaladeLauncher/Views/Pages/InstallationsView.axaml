@@ -5,7 +5,7 @@
              xmlns:vm="using:MarmaladeLauncher.ViewModels"
              xmlns:m="using:MarmaladeLauncher.Models"
              xmlns:dialogs="using:MarmaladeLauncher.Views.Dialogs"
-             xmlns:lang="clr-namespace:MarmaladeLauncher.Assets.Localisation"
+             xmlns:localisation="clr-namespace:Common.Assets.Localisation;assembly=MarmaladeLauncher.Common"
              x:DataType="vm:InstallationsViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MarmaladeLauncher.Views.Pages.InstallationsView"
@@ -14,14 +14,14 @@
     <Grid>
         <Grid RowDefinitions="Auto, *, Auto" Margin="20">
             <TextBlock Grid.Row="0" 
-                       Text="{x:Static lang:Resources.Installations_Header}" 
+                       Text="{x:Static localisation:Resources.Installations_Header}" 
                        FontSize="22" 
                        FontWeight="Bold" 
                        HorizontalAlignment="Left" 
                        Margin="0,0,0,15" />
 
             <Panel Grid.Row="1">
-                <TextBlock Text="{x:Static lang:Resources.Installations_NoInstallsWarning}"  
+                <TextBlock Text="{x:Static localisation:Resources.Installations_NoInstallsWarning}"  
                            FontSize="18"
                            HorizontalAlignment="Center" 
                            VerticalAlignment="Center"
@@ -75,17 +75,17 @@
                                                     Spacing="8" 
                                                     VerticalAlignment="Center">
 
-                                            <Button Content="{x:Static lang:Resources.Installations_Remove}"
+                                            <Button Content="{x:Static localisation:Resources.Installations_Remove}"
                                                     Background="Red"
                                                     Foreground="White"
                                                     Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).RemoveInstallationCommand}"
                                                     CommandParameter="{Binding}"/>
                                             
-                                            <Button Content="{x:Static lang:Resources.Installations_Settings}"
+                                            <Button Content="{x:Static localisation:Resources.Installations_Settings}"
                                                     Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).OpenSettingsCommand}"
                                                     CommandParameter="{Binding}"/>
                                             
-                                            <Button Content="{x:Static lang:Resources.Installations_Launch}"
+                                            <Button Content="{x:Static localisation:Resources.Installations_Launch}"
                                                     Classes="accent"
                                                     Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).LaunchInstallationCommand}"
                                                     CommandParameter="{Binding}"/>
@@ -104,11 +104,11 @@
                         Spacing="10" 
                         Margin="0,15,0,0">
                 
-                <Button Content="{x:Static lang:Resources.Installations_Locate}"
+                <Button Content="{x:Static localisation:Resources.Installations_Locate}"
                         Command="{Binding LocateExistingInstallationCommand}"
                         Width="128" 
                         HorizontalContentAlignment="Center" />
-                <Button Content="{x:Static lang:Resources.Installations_Install}"
+                <Button Content="{x:Static localisation:Resources.Installations_Install}"
                         Width="90"
                         Command="{Binding OpenInstallCommand}"
                         HorizontalContentAlignment="Center" 

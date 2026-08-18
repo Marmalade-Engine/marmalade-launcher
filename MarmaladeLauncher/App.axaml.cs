@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using MarmaladeLauncher.Services;
+using MarmaladeLauncher.Utils;
 using MarmaladeLauncher.ViewModels;
 using MarmaladeLauncher.Views;
 
@@ -25,7 +26,7 @@ public partial class App : Application {
                 DataContext = new MainViewModel(settingsService, localisationService),
             };
             
-            localisationService.ToggleRTL(desktop.MainWindow, CultureInfo.CurrentCulture.TextInfo.IsRightToLeft);
+            desktop.MainWindow.SetRTL(CultureInfo.CurrentCulture.TextInfo.IsRightToLeft);
         }
 
         base.OnFrameworkInitializationCompleted();

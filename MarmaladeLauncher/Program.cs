@@ -3,8 +3,7 @@ using System;
 
 namespace MarmaladeLauncher;
 
-sealed class Program
-{
+sealed class Program {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -15,7 +14,7 @@ sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .With(new Win32PlatformOptions  {
+            .With(new Win32PlatformOptions {
                 RenderingMode = new[] { Win32RenderingMode.Software }
             })
             .With(new AvaloniaNativePlatformOptions {

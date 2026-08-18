@@ -3,8 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:MarmaladeLauncher.ViewModels"
-             xmlns:m="clr-namespace:MarmaladeLauncher.Models"
-             xmlns:lang="clr-namespace:MarmaladeLauncher.Assets.Localisation"
+             xmlns:models="clr-namespace:MarmaladeLauncher.Models;assembly=Common"
+             xmlns:localisation="clr-namespace:Common.Assets.Localisation;assembly=MarmaladeLauncher.Common"
+             xmlns:models1="clr-namespace:MarmaladeLauncher.Models;assembly=MarmaladeLauncher.Common"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="vm:InstallationsViewModel"
              x:Class="MarmaladeLauncher.Views.Dialogs.Install">
@@ -44,7 +45,7 @@
                          SelectedItem="{Binding SelectedEngineToInstall, Mode=TwoWay}"
                          Background="Transparent">
                     <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="m:EngineInstallation">
+                        <DataTemplate x:DataType="models1:EngineInstallation">
                             <Grid ColumnDefinitions="*, Auto">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <TextBlock Text="{Binding Version}"
@@ -85,7 +86,7 @@
 
             <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
                 <CheckBox Grid.Column="0"
-                          Content="{x:Static lang:Resources.Installations_FilterDevBuilds}"
+                          Content="{x:Static localisation:Resources.Installations_FilterDevBuilds}"
                           IsChecked="{Binding ShowDevBuilds, Mode=TwoWay}"
                           VerticalAlignment="Center"
                           IsVisible="{Binding AllowDevBuilds}" />

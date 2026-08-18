@@ -4,20 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:MarmaladeLauncher.ViewModels"
              xmlns:m="using:MarmaladeLauncher.Models"
-             xmlns:lang="clr-namespace:MarmaladeLauncher.Assets.Localisation"
+             xmlns:localisation="clr-namespace:Common.Assets.Localisation;assembly=MarmaladeLauncher.Common"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MarmaladeLauncher.Views.Pages.SettingsView"
              x:DataType="vm:SettingsViewModel">
 
     <Grid RowDefinitions="*, Auto" Margin="20">
         <StackPanel Grid.Row="0" Spacing="20">
-            <TextBlock FontSize="22" FontWeight="Bold" Text="{x:Static lang:Resources.Settings_Header}" />
+            <TextBlock FontSize="22" FontWeight="Bold" Text="{x:Static localisation:Resources.Settings_Header}" />
 
             <StackPanel Spacing="10">
-                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{x:Static lang:Resources.Settings_EngineSettings}" />
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{x:Static localisation:Resources.Settings_EngineSettings}" />
 
                 <StackPanel Orientation="Horizontal" Spacing="10">
-                    <TextBlock Text="{x:Static lang:Resources.Settings_DefaultEngineInstallPath}"
+                    <TextBlock Text="{x:Static localisation:Resources.Settings_DefaultEngineInstallPath}"
                                FontSize="14"
                                VerticalAlignment="Center" />
 
@@ -28,13 +28,13 @@
                              Width="380"
                              VerticalAlignment="Center" />
 
-                    <Button Content="{x:Static lang:Resources.Settings_BrowsePrompt}"
+                    <Button Content="{x:Static localisation:Resources.Settings_BrowsePrompt}"
                             Command="{Binding BrowseFolderCommand}"
                             VerticalAlignment="Center" />
 
-                    <Button Content="{x:Static lang:Resources.Settings_ResetPath}"
+                    <Button Content="{x:Static localisation:Resources.Settings_ResetPath}"
                             Command="{Binding ResetToDefaultCommand}"
-                            ToolTip.Tip="{x:Static lang:Resources.Settings_ResetPathTooltip}"
+                            ToolTip.Tip="{x:Static localisation:Resources.Settings_ResetPathTooltip}"
                             VerticalAlignment="Center" />
                 </StackPanel>
             </StackPanel>
@@ -43,10 +43,10 @@
 
             <StackPanel Spacing="10">
                 <TextBlock FontSize="18" FontWeight="SemiBold"
-                           Text="{x:Static lang:Resources.Settings_LauncherSettings}" />
+                           Text="{x:Static localisation:Resources.Settings_LauncherSettings}" />
 
                 <StackPanel Orientation="Horizontal" Spacing="15">
-                    <TextBlock Text="{x:Static lang:Resources.Settings_PostLaunchBehaviour}"
+                    <TextBlock Text="{x:Static localisation:Resources.Settings_PostLaunchBehaviour}"
                                FontSize="14"
                                Width="180"
                                VerticalAlignment="Center" />
@@ -59,7 +59,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Spacing="15">
-                    <TextBlock Text="{x:Static lang:Resources.Settings_Language}"
+                    <TextBlock Text="{x:Static localisation:Resources.Settings_Language}"
                                FontSize="14"
                                Width="180"
                                VerticalAlignment="Center" />
@@ -85,7 +85,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Spacing="15">
-                    <TextBlock Text="{x:Static lang:Resources.Settings_EnableDevBuilds}"
+                    <TextBlock Text="{x:Static localisation:Resources.Settings_EnableDevBuilds}"
                                FontSize="14"
                                Width="180"
                                VerticalAlignment="Center" />
@@ -103,11 +103,11 @@
                     HorizontalAlignment="Right"
                     Spacing="10"
                     IsVisible="{Binding IsDirty}">
-            <Button Content="{x:Static lang:Resources.Settings_CancelChanges}"
+            <Button Content="{x:Static localisation:Resources.Settings_CancelChanges}"
                     Command="{Binding CancelCommand}"
                     Width="90"
                     HorizontalContentAlignment="Center" />
-            <Button Content="{x:Static lang:Resources.Settings_SaveSettings}"
+            <Button Content="{x:Static localisation:Resources.Settings_SaveSettings}"
                     Command="{Binding SaveCommand}"
                     Width="90"
                     HorizontalContentAlignment="Center"

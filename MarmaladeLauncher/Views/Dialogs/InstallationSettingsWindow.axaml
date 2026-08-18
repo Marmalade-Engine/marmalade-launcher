@@ -3,8 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:models="using:MarmaladeLauncher.Models"
-             xmlns:lang="clr-namespace:MarmaladeLauncher.Assets.Localisation"
              xmlns:vm="clr-namespace:MarmaladeLauncher.ViewModels"
+             xmlns:localisation="clr-namespace:Common.Assets.Localisation;assembly=MarmaladeLauncher.Common"
              x:DataType="models:EngineInstallation"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MarmaladeLauncher.Views.Dialogs.InstallationSettingsWindow">
@@ -16,15 +16,15 @@
             HorizontalAlignment="Center" 
             VerticalAlignment="Center">
         <StackPanel Spacing="15">
-            <TextBlock Text="{x:Static lang:Resources.Modal_Installation_Settings}" FontSize="18" FontWeight="Bold"/>
+            <TextBlock Text="{x:Static localisation:Resources.Modal_Installation_Settings}" FontSize="18" FontWeight="Bold"/>
 
             <StackPanel Spacing="5">
-                <TextBlock Text="{x:Static lang:Resources.Modal_Installation_ExecutablePath}" FontSize="12" Foreground="Gray"/>
+                <TextBlock Text="{x:Static localisation:Resources.Modal_Installation_ExecutablePath}" FontSize="12" Foreground="Gray"/>
                 <TextBox Text="{Binding ExecutablePath}" IsReadOnly="True" />
             </StackPanel>
 
             <StackPanel Spacing="5">
-                <TextBlock Text="{x:Static lang:Resources.Modal_Installation_CommandLineArguments}" FontSize="12" Foreground="Gray"/>
+                <TextBlock Text="{x:Static localisation:Resources.Modal_Installation_CommandLineArguments}" FontSize="12" Foreground="Gray"/>
                 <TextBox Text="{Binding Arguments, Mode=TwoWay}" Watermark="--no-splash" />
             </StackPanel>
 
@@ -34,8 +34,8 @@
                     Margin="0,10,0,0">
                 <Button.Content>
                     <MultiBinding StringFormat="{}{0} &amp; {1}">
-                        <Binding Source="{x:Static lang:Resources.Modal_Installation_Save}" />
-                        <Binding Source="{x:Static lang:Resources.Modal_Installation_Close}" />
+                        <Binding Source="{x:Static localisation:Resources.Modal_Installation_Save}" />
+                        <Binding Source="{x:Static localisation:Resources.Modal_Installation_Close}" />
                     </MultiBinding>
                 </Button.Content>
             </Button>

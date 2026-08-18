@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MarmaladeLauncher.Assets.Localisation;
+using Common.Assets.Localisation;
 using MarmaladeLauncher.Models;
 using MarmaladeLauncher.Services;
+using MarmaladeLauncher.Utils;
 
 namespace MarmaladeLauncher.ViewModels;
 
@@ -25,19 +27,15 @@ public partial class SettingsViewModel : ViewModelBase {
     private readonly SettingsService _settingsService;
     private readonly LocalisationService _localisationService;
 
-    [ObservableProperty]
-    private string _defaultInstallLocation = string.Empty;
+    [ObservableProperty] private string _defaultInstallLocation = string.Empty;
 
-    [ObservableProperty]
-    private PostLaunchOption _selectedPostLaunchOption = null!;
-    
+    [ObservableProperty] private PostLaunchOption _selectedPostLaunchOption = null!;
+
     public List<LocalisationEntry.LanguageMetadata> Locales { get; } = LocalisationEntry.LanguageDisplay.languages;
-    
-    [ObservableProperty]
-    private LocalisationEntry.LanguageMetadata? _selectedLocale;
-    
-    [ObservableProperty]
-    private bool _isDirty;
+
+    [ObservableProperty] private LocalisationEntry.LanguageMetadata? _selectedLocale;
+
+    [ObservableProperty] private bool _isDirty;
 
     public string DefaultPathPlaceholder { get; } = SettingsService.DefaultBaseDirectory;
 
@@ -47,13 +45,12 @@ public partial class SettingsViewModel : ViewModelBase {
         new(PostLaunchBehaviour.PostLaunchBehaviour_CLOSE)
     ];
 
-    [ObservableProperty]
-    private bool _enableDevBuilds;
+    [ObservableProperty] private bool _enableDevBuilds;
 
     public SettingsViewModel(SettingsService settingsService, LocalisationService localisationService) {
         _settingsService = settingsService;
         _localisationService = localisationService;
-        
+
         ResetToSaved();
     }
 
@@ -62,18 +59,25 @@ public partial class SettingsViewModel : ViewModelBase {
     partial void OnDefaultInstallLocationChanged(string value) {
         CheckDirtyState();
     }
-    
+
     partial void OnSelectedPostLaunchOptionChanged(PostLaunchOption value) => CheckDirtyState();
 
     partial void OnEnableDevBuildsChanged(bool value) => CheckDirtyState();
-    
+
     partial void OnSelectedLocaleChanged(LocalisationEntry.LanguageMetadata? value) {
         if (value != null && _localisationService != null) {
             _localisationService.CurrentLocale = value.LocaleKey;
-            
+
             OnPropertyChanged(nameof(PostLaunchOptions));
             OnPropertyChanged(nameof(Locales));
+
+            bool isRtl = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+
+            if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+                desktop.MainWindow?.SetRTL(isRtl);
+            }
         }
+
         CheckDirtyState();
     }
 
@@ -84,7 +88,7 @@ public partial class SettingsViewModel : ViewModelBase {
         bool isBehaviorDirty = SelectedPostLaunchOption?.Value != _settingsService.Settings.PostLaunchBehaviour;
         bool isLocaleDirty = _selectedLocale?.LocaleKey != _settingsService.Settings.CurrentLocale;
         bool isDevBuildsDirty = EnableDevBuilds != _settingsService.Settings.EnableDevBuilds;
-        
+
         IsDirty = isLocationDirty || isBehaviorDirty || isLocaleDirty || isDevBuildsDirty;
     }
 
@@ -102,25 +106,24 @@ public partial class SettingsViewModel : ViewModelBase {
     private void ResetToSaved() {
         var savedBehaviour = _settingsService.Settings.PostLaunchBehaviour;
         var savedLocaleKey = _settingsService.Settings.CurrentLocale;
-        
+
         DefaultInstallLocation = _settingsService.Settings.DefaultInstallLocation;
-        
-        SelectedPostLaunchOption = PostLaunchOptions.FirstOrDefault(o => o.Value == savedBehaviour) 
+
+        SelectedPostLaunchOption = PostLaunchOptions.FirstOrDefault(o => o.Value == savedBehaviour)
                                    ?? PostLaunchOptions[0];
 
-        SelectedLocale = Locales.FirstOrDefault(l => l.LocaleKey == savedLocaleKey) 
+        SelectedLocale = Locales.FirstOrDefault(l => l.LocaleKey == savedLocaleKey)
                          ?? Locales.FirstOrDefault(l => l.LocaleKey == "en-GB");
-    
+
         EnableDevBuilds = _settingsService.Settings.EnableDevBuilds;
-        
+
         IsDirty = false;
     }
 
     [RelayCommand]
     private async Task BrowseFolderAsync() {
-        if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop 
+        if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
             && desktop.MainWindow?.StorageProvider is { } storageProvider) {
-            
             var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions {
                 Title = "Select Installation Directory",
                 AllowMultiple = false
@@ -140,7 +143,7 @@ public partial class SettingsViewModel : ViewModelBase {
             CurrentLocale = _selectedLocale?.LocaleKey ?? "en-GB",
             EnableDevBuilds = EnableDevBuilds
         };
-        
+
         await _settingsService.SaveSettings(updatedSettings);
         IsDirty = false;
     }
