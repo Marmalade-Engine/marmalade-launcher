@@ -139,7 +139,7 @@ public partial class InstallationsViewModel : ViewModelBase {
             }
         }
         catch (Exception e) {
-            Debug.WriteLine($"[InstallEngine] Installation failed: {e.Message}");
+            Debug.WriteLine($"Installation failed: {e.Message}");
         }
         finally {
             IsInstalling = false;
@@ -402,7 +402,7 @@ public partial class InstallationsViewModel : ViewModelBase {
             }
         }
         catch (Exception ex) {
-            Debug.WriteLine($"[FetchEngineVersions] Error fetching versions: {ex.Message}");
+            Debug.WriteLine($"Error fetching versions: {ex.Message}");
             return new List<EngineInstallation>();
         }
     }

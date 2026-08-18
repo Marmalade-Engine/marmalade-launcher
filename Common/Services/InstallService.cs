@@ -359,13 +359,7 @@ public class InstallService {
 
             string bundleNameWithoutExt = Path.GetFileNameWithoutExtension(appName);
             string innerBinaryPath = Path.Combine(destinationAppPath, "Contents", "MacOS", bundleNameWithoutExt);
-
-            if (File.Exists(innerBinaryPath)) {
-                SetUnixExecutablePermissions(innerBinaryPath);
-                
-                return innerBinaryPath;
-            }
-
+            
             string macOsDir = Path.Combine(destinationAppPath, "Contents", "MacOS");
             if (Directory.Exists(macOsDir)) {
                 var files = Directory.GetFiles(macOsDir);

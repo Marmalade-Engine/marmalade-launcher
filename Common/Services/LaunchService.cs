@@ -42,10 +42,14 @@ public class LaunchService {
                 };
             }
 
-            using (var process = Process.Start(startInfo)) {
-                Console.WriteLine($"Detached process started for '{item.Name}' with args: '{combinedArgs}'");
+            var process = Process.Start(startInfo);
+            if (process == null) {
+                Console.WriteLine($"Error launching engine: {item.ExecutablePath}");
+                return false;
             }
-
+            
+            Console.WriteLine($"Launching engine: {item.ExecutablePath}");
+            
             if (onPostLaunch != null) {
                 await onPostLaunch();
             }
@@ -66,7 +70,7 @@ public class LaunchService {
             : Path.GetDirectoryName(resolvedPath) ?? string.Empty;
 
         if (!string.IsNullOrEmpty(appBundlePath)) {
-            var args = $"-n \"{appBundlePath}\"";
+            string args = $"-W -n {appBundlePath}";
             if (!string.IsNullOrWhiteSpace(combinedArgs)) {
                 args += $" --args {combinedArgs}";
             }
@@ -80,10 +84,9 @@ public class LaunchService {
             };
         }
 
-        string binaryArgs = string.IsNullOrWhiteSpace(combinedArgs) ? "" : $" {combinedArgs}";
         return new ProcessStartInfo {
-            FileName = "/bin/zsh",
-            Arguments = $"-c \"nohup '{resolvedPath}'{binaryArgs} > /dev/null 2>&1 &\"",
+            FileName = resolvedPath,
+            Arguments = combinedArgs,
             UseShellExecute = false,
             CreateNoWindow = true,
             WorkingDirectory = workingDir
