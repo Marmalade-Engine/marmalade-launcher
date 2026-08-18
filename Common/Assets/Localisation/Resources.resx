@@ -45,6 +45,7 @@
     <data name="Modal.Installation.Settings" xml:space="preserve">Installation Settings</data>
     <data name="Modal.Installation.ExecutablePath" xml:space="preserve">Executable Path</data>
     <data name="Modal.Installation.CommandLineArguments" xml:space="preserve">Additional Command Line Arguments</data>
+    <data name="Modal.Installation.Uninstall" xml:space="preserve">Uninstall</data>
     <data name="Modal.Installation.Save" xml:space="preserve">Save</data>
     <data name="Modal.Installation.Close" xml:space="preserve">Close</data>
 

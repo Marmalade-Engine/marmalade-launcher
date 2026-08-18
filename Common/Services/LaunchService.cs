@@ -21,25 +21,29 @@ public class LaunchService {
             return false;
 
         try {
+            string defaultLocation = _settingsService.Settings.DefaultInstallLocation;
+            string resolvedPath = item.GetResolvedExecutablePath(defaultLocation);
             string combinedArgs = BuildCombinedArguments(item.Arguments, extraArgs);
 
             ProcessStartInfo startInfo;
 
             if (OperatingSystem.IsMacOS()) {
-                startInfo = CreateMacDetachedStartInfo(item, combinedArgs);
-            } else if (OperatingSystem.IsLinux()) {
-                startInfo = CreateLinuxDetachedStartInfo(item, combinedArgs);
-            } else {
+                startInfo = CreateMacDetachedStartInfo(item, resolvedPath, combinedArgs, defaultLocation);
+            }
+            else if (OperatingSystem.IsLinux()) {
+                startInfo = CreateLinuxDetachedStartInfo(resolvedPath, combinedArgs);
+            }
+            else {
                 startInfo = new ProcessStartInfo {
-                    FileName = item.ExecutablePath,
+                    FileName = resolvedPath,
                     Arguments = combinedArgs,
                     UseShellExecute = true,
-                    WorkingDirectory = Path.GetDirectoryName(item.ExecutablePath) ?? string.Empty
+                    WorkingDirectory = Path.GetDirectoryName(resolvedPath) ?? string.Empty
                 };
             }
 
             using (var process = Process.Start(startInfo)) {
-                Console.WriteLine($"[Launch] Detached process started for '{item.Name}' with args: '{combinedArgs}'");
+                Console.WriteLine($"Detached process started for '{item.Name}' with args: '{combinedArgs}'");
             }
 
             if (onPostLaunch != null) {
@@ -49,14 +53,17 @@ public class LaunchService {
             return true;
         }
         catch (Exception e) {
-            Console.WriteLine($"[Launch] Error launching executable: {e.Message}");
+            Console.WriteLine($"Error launching executable: {e.Message}");
             return false;
         }
     }
 
-    private ProcessStartInfo CreateMacDetachedStartInfo(EngineInstallation item, string combinedArgs) {
-        string workingDir = Path.GetDirectoryName(item.ExecutablePath) ?? string.Empty;
-        string appBundlePath = GetMacAppBundlePath(item.ExecutablePath);
+    private ProcessStartInfo CreateMacDetachedStartInfo(EngineInstallation item, string resolvedPath,
+        string combinedArgs, string defaultLocation) {
+        string appBundlePath = GetMacAppBundlePath(resolvedPath);
+        string workingDir = !string.IsNullOrEmpty(appBundlePath)
+            ? Path.GetDirectoryName(appBundlePath) ?? string.Empty
+            : Path.GetDirectoryName(resolvedPath) ?? string.Empty;
 
         if (!string.IsNullOrEmpty(appBundlePath)) {
             var args = $"-n \"{appBundlePath}\"";
@@ -76,34 +83,34 @@ public class LaunchService {
         string binaryArgs = string.IsNullOrWhiteSpace(combinedArgs) ? "" : $" {combinedArgs}";
         return new ProcessStartInfo {
             FileName = "/bin/zsh",
-            Arguments = $"-c \"nohup '{item.ExecutablePath}'{binaryArgs} > /dev/null 2>&1 &\"",
+            Arguments = $"-c \"nohup '{resolvedPath}'{binaryArgs} > /dev/null 2>&1 &\"",
             UseShellExecute = false,
             CreateNoWindow = true,
             WorkingDirectory = workingDir
         };
     }
 
-    private ProcessStartInfo CreateLinuxDetachedStartInfo(EngineInstallation item, string combinedArgs) {
-        string workingDir = Path.GetDirectoryName(item.ExecutablePath) ?? string.Empty;
+    private ProcessStartInfo CreateLinuxDetachedStartInfo(string resolvedPath, string combinedArgs) {
+        string workingDir = Path.GetDirectoryName(resolvedPath) ?? string.Empty;
         string binaryArgs = string.IsNullOrWhiteSpace(combinedArgs) ? "" : $" {combinedArgs}";
 
         return new ProcessStartInfo {
             FileName = "/bin/bash",
-            Arguments = $"-c \"nohup '{item.ExecutablePath}'{binaryArgs} > /dev/null 2>&1 &\"",
+            Arguments = $"-c \"nohup '{resolvedPath}'{binaryArgs} > /dev/null 2>&1 &\"",
             UseShellExecute = false,
             CreateNoWindow = true,
             WorkingDirectory = workingDir
         };
     }
 
-    private string GetMacAppBundlePath(string executablePath) {
-        if (executablePath.EndsWith(".app", StringComparison.OrdinalIgnoreCase) && Directory.Exists(executablePath)) {
-            return executablePath;
+    private string GetMacAppBundlePath(string resolvedPath) {
+        if (resolvedPath.EndsWith(".app", StringComparison.OrdinalIgnoreCase) && Directory.Exists(resolvedPath)) {
+            return resolvedPath;
         }
 
-        int appIndex = executablePath.IndexOf(".app", StringComparison.OrdinalIgnoreCase);
+        int appIndex = resolvedPath.IndexOf(".app", StringComparison.OrdinalIgnoreCase);
         if (appIndex != -1) {
-            string bundlePath = executablePath.Substring(0, appIndex + 4);
+            string bundlePath = resolvedPath.Substring(0, appIndex + 4);
             if (Directory.Exists(bundlePath)) {
                 return bundlePath;
             }

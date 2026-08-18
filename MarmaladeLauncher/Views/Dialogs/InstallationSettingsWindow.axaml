@@ -27,6 +27,13 @@
                 <TextBlock Text="{x:Static localisation:Resources.Modal_Installation_CommandLineArguments}" FontSize="12" Foreground="Gray"/>
                 <TextBox Text="{Binding Arguments, Mode=TwoWay}" Watermark="--no-splash" />
             </StackPanel>
+            
+            <Button Content="{x:Static localisation:Resources.Modal_Installation_Uninstall}"
+                    Background="Red"
+                    Foreground="White"
+                    Command="{Binding $parent[UserControl;1].((vm:InstallationsViewModel)DataContext).UninstallConfirmationCommand}"
+                    CommandParameter="{Binding}"/>
+
 
             <Button HorizontalAlignment="Right" 
                     Command="{Binding $parent[UserControl;1].((vm:InstallationsViewModel)DataContext).CloseSettingsCommand}"

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Avalonia;
 using Avalonia.Controls;
@@ -16,16 +17,25 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MarmaladeLauncher.Models;
 using MarmaladeLauncher.Services;
+using MarmaladeLauncher.Views.Dialogs;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 
 namespace MarmaladeLauncher.ViewModels;
 
 public partial class InstallationsViewModel : ViewModelBase {
-    private readonly InstallationService _installService;
+    private readonly InstallationService _installationService;
     private readonly SettingsService _settingsService;
     private readonly LaunchService _launchService;
+    private readonly InstallService _installService;
+
+    private readonly Dictionary<EngineInstallation, InstallationEntry> _versionToEntryMap = new();
+
+    [ObservableProperty] private bool _isInstalling;
+    [ObservableProperty] private double _downloadProgress;
 
     private List<EngineInstallation> _allAvailableEngineInstallations = new();
-    
+
     [ObservableProperty] private ObservableCollection<EngineInstallation> _installations = new();
 
     [ObservableProperty] private ObservableCollection<EngineInstallation> _engineInstallations = new();
@@ -44,22 +54,28 @@ public partial class InstallationsViewModel : ViewModelBase {
     [ObservableProperty] private bool _allowDevBuilds;
 
     [ObservableProperty] private bool _showDevBuilds = true;
-    
+
     private string EngineDownloadsURI =>
         $"https://www.ryanbester.com/download?product=marmalade-engine&branch=dev&platform={GetCurrentPlatform()}&list";
 
-    public InstallationsViewModel(InstallationService installService, SettingsService settingsService, LaunchService launchService) {
-        _installService = installService;
+    public InstallationsViewModel(InstallationService installationService, SettingsService settingsService,
+        LaunchService launchService, InstallService installService) {
+        _installationService = installationService;
         _settingsService = settingsService;
         _launchService = launchService;
-    
+        _installService = installService;
+
         _settingsService.LoadSettings();
         AllowDevBuilds = _settingsService.Settings.EnableDevBuilds;
-    
+
         _ = LoadData();
     }
 
-    public InstallationsViewModel() : this(new InstallationService(), CreateAndLoadSettingsService(), new LaunchService(CreateAndLoadSettingsService())) { }
+    public InstallationsViewModel() : this(
+        CreateAndLoadInstallationService(),
+        CreateAndLoadSettingsService(),
+        new LaunchService(CreateAndLoadSettingsService()),
+        new InstallService(CreateAndLoadInstallationService(), CreateAndLoadSettingsService())) { }
 
     private static SettingsService CreateAndLoadSettingsService() {
         var service = new SettingsService();
@@ -67,17 +83,24 @@ public partial class InstallationsViewModel : ViewModelBase {
         return service;
     }
 
+    private static InstallationService CreateAndLoadInstallationService() {
+        return new InstallationService();
+    }
+
     private async Task LoadData() {
-        var list = await _installService.LoadInstallations();
+        var list = await _installationService.LoadInstallations();
+
+        foreach (var installation in list) {
+            installation.RefreshValidation();
+        }
+
         Installations = new ObservableCollection<EngineInstallation>(list);
-        
         _allAvailableEngineInstallations = await FetchEngineVersions();
-        
+
         ApplyEngineFilter();
-        
         UpdateState();
     }
-    
+
     partial void OnShowDevBuildsChanged(bool value) {
         ApplyEngineFilter();
     }
@@ -88,6 +111,46 @@ public partial class InstallationsViewModel : ViewModelBase {
         AllowDevBuilds = _settingsService.Settings.EnableDevBuilds;
     }
 
+    /// <summary>
+    /// Downloads and installs the currently selected engine
+    /// </summary>
+    [RelayCommand]
+    private async Task InstallEngine() {
+        if (SelectedEngineToInstall == null ||
+            !_versionToEntryMap.TryGetValue(SelectedEngineToInstall, out var entry)) {
+            return;
+        }
+
+        IsInstalling = true;
+        var progress = new Progress<double>(val => DownloadProgress = val);
+
+        string targetDirectory = !string.IsNullOrWhiteSpace(_settingsService.Settings.DefaultInstallLocation)
+            ? _settingsService.Settings.DefaultInstallLocation
+            : Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                SettingsService.DefaultBaseDirectory,
+                "installations");
+
+        try {
+            var newInstall = await _installService.InstallEngine(entry, targetDirectory, progress);
+            if (newInstall != null) {
+                Installations.Add(newInstall);
+                UpdateState();
+            }
+        }
+        catch (Exception e) {
+            Debug.WriteLine($"[InstallEngine] Installation failed: {e.Message}");
+        }
+        finally {
+            IsInstalling = false;
+            IsInstallModalOpen = false;
+            SelectedEngineToInstall = null;
+        }
+    }
+
+    /// <summary>
+    /// Prompts user to select an existing engine installation with native file picker
+    /// </summary>
     [RelayCommand]
     private async Task LocateExistingInstallation() {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
@@ -125,9 +188,14 @@ public partial class InstallationsViewModel : ViewModelBase {
         }
     }
 
+    /// <summary>
+    /// Validates, formats, and registers the local installation into the collection
+    /// </summary>
+    /// <param name="fullPath"></param>
     private async Task RegisterInstallation(string fullPath) {
         string executablePath = fullPath;
 
+        // on macos resolve the target path to the exec binary
         if (OperatingSystem.IsMacOS() && fullPath.EndsWith(".app", StringComparison.OrdinalIgnoreCase)) {
             string bundleName = Path.GetFileNameWithoutExtension(fullPath);
             string innerBinary = Path.Combine(fullPath, "Contents", "MacOS", bundleName);
@@ -137,8 +205,13 @@ public partial class InstallationsViewModel : ViewModelBase {
             }
         }
 
-        if (Installations.Any(i => i.ExecutablePath.Equals(executablePath, StringComparison.OrdinalIgnoreCase)))
+        // prevent duplicate entries
+        bool isAlreadyRegistered = Installations.Any(i => 
+            i.ExecutablePath.Equals(executablePath, StringComparison.OrdinalIgnoreCase));
+
+        if (isAlreadyRegistered) {
             return;
+        }
 
         string displayName = Path.GetFileNameWithoutExtension(fullPath);
 
@@ -151,9 +224,13 @@ public partial class InstallationsViewModel : ViewModelBase {
         Installations.Add(newEngine);
         UpdateState();
 
-        await _installService.SaveInstallations(Installations);
+        await _installationService.SaveInstallations(Installations);
     }
 
+    /// <summary>
+    /// Removes local engine installation entry in collection
+    /// </summary>
+    /// <param name="item"></param>
     [RelayCommand]
     private async Task RemoveInstallation(EngineInstallation item) {
         if (item == null) return;
@@ -161,32 +238,38 @@ public partial class InstallationsViewModel : ViewModelBase {
         Installations.Remove(item);
         UpdateState();
 
-        await _installService.SaveInstallations(Installations);
+        await _installationService.SaveInstallations(Installations);
     }
-
+    
+    /// <summary>
+    /// Validates and launches a target engine installation
+    /// </summary>
+    /// <param name="item"></param>
     [RelayCommand]
     private async Task LaunchInstallation(EngineInstallation item) {
         if (item == null) return;
 
+        item.RefreshValidation();
+        if (!item.IsExecutableValid) {
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+                && desktop.MainWindow != null) {
+                string resolvedPath = item.GetResolvedExecutablePath(_settingsService.Settings.DefaultInstallLocation);
+                var box = MessageBoxManager.GetMessageBoxStandard(
+                    "Executable Missing",
+                    $"Cannot launch {item.Name}. The executable was moved or deleted:\n{resolvedPath}",
+                    ButtonEnum.Ok);
+                await box.ShowWindowDialogAsync(desktop.MainWindow);
+            }
+
+            return;
+        }
+
         await _launchService.LaunchAsync(item, onPostLaunch: ExecutePostLaunchBehaviorAsync);
     }
 
-    private string GetMacAppBundlePath(string executablePath) {
-        if (executablePath.EndsWith(".app", StringComparison.OrdinalIgnoreCase) && Directory.Exists(executablePath)) {
-            return executablePath;
-        }
-
-        int appIndex = executablePath.IndexOf(".app", StringComparison.OrdinalIgnoreCase);
-        if (appIndex != -1) {
-            string bundlePath = executablePath.Substring(0, appIndex + 4);
-            if (Directory.Exists(bundlePath)) {
-                return bundlePath;
-            }
-        }
-
-        return string.Empty;
-    }
-
+    /// <summary>
+    /// Processes the post-engine-launch behaviour of the engine 
+    /// </summary>
     private async Task ExecutePostLaunchBehaviorAsync() {
         _settingsService.LoadSettings();
 
@@ -212,7 +295,7 @@ public partial class InstallationsViewModel : ViewModelBase {
             }
         }
     }
-
+    
     [RelayCommand]
     private void OpenSettings(EngineInstallation item) {
         if (item == null) return;
@@ -224,7 +307,7 @@ public partial class InstallationsViewModel : ViewModelBase {
     private async Task CloseSettings() {
         IsSettingsModalOpen = false;
         SelectedInstallation = null;
-        await _installService.SaveInstallations(Installations);
+        await _installationService.SaveInstallations(Installations);
     }
 
     [RelayCommand]
@@ -232,7 +315,7 @@ public partial class InstallationsViewModel : ViewModelBase {
         _settingsService.LoadSettings();
         AllowDevBuilds = _settingsService.Settings.EnableDevBuilds;
         ApplyEngineFilter();
-    
+
         IsInstallModalOpen = true;
     }
 
@@ -242,54 +325,97 @@ public partial class InstallationsViewModel : ViewModelBase {
         SelectedEngineToInstall = null;
     }
 
+    [RelayCommand]
+    private async Task UninstallConfirmation(EngineInstallation? item) {
+        if (item == null) return;
+
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+            && desktop.MainWindow != null) {
+            bool confirmed = await ShowConfirmationDialog(
+                desktop.MainWindow,
+                "Confirm Uninstallation",
+                $"Are you sure you want to uninstall {item.Name}?"
+            );
+
+            if (confirmed) {
+                IsSettingsModalOpen = false;
+                await _installService.UninstallEngineAsync(item);
+
+                Installations.Remove(item);
+
+                UpdateState();
+            }
+        }
+    }
+
+    private async Task<bool> ShowConfirmationDialog(Window parent, string title, string message) {
+        var dialog = MessageBoxManager.GetMessageBoxStandard(title, message, ButtonEnum.YesNo);
+        var result = await dialog.ShowWindowDialogAsync(parent);
+        return result == ButtonResult.Yes;
+    }
+
     private async Task<List<EngineInstallation>> FetchEngineVersions() {
+        string currentPlatform = GetCurrentPlatform();
+        string requestUri = EngineDownloadsURI;
+
         try {
             using (var client = new HttpClient()) {
                 client.Timeout = TimeSpan.FromSeconds(10);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("MarmaladeLauncher/1.0");
 
-                string response = await client.GetStringAsync(EngineDownloadsURI);
+                string jsonResponse = await client.GetStringAsync(requestUri);
                 var installations = new List<EngineInstallation>();
-                var data = JsonNode.Parse(response);
+                var jsonNode = JsonNode.Parse(jsonResponse);
 
-                if (data is JsonObject jsonObject && jsonObject["builds"] is JsonArray buildsArray) {
-                    string currentPlatform = GetCurrentPlatform();
-                    
-                    foreach (var item in buildsArray) {
-                        string url = item["url"]?.ToString() ?? string.Empty;
+                if (jsonNode?["builds"] is JsonArray buildsArray) {
+                    var serializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var entries = buildsArray.Deserialize<List<InstallationEntry>>(serializerOptions) ?? new();
 
-                        if (!string.IsNullOrEmpty(url) && 
-                            !url.Contains($"platform={currentPlatform}", StringComparison.OrdinalIgnoreCase)) {
+                    foreach (var entry in entries) {
+                        if (!string.IsNullOrEmpty(entry.url) &&
+                            !entry.url.Contains($"platform={currentPlatform}", StringComparison.OrdinalIgnoreCase)) {
                             continue;
                         }
-                        
-                        string branch = "release";
-                        if (url.Contains("branch=dev", StringComparison.OrdinalIgnoreCase)) {
-                            branch = "dev";
-                        }
 
-                        long.TryParse(item["size"]?.ToString(), out long parsedSize);
+                        string branch = (!string.IsNullOrEmpty(entry.url) &&
+                                         entry.url.Contains("branch=dev", StringComparison.OrdinalIgnoreCase))
+                            ? "dev"
+                            : "release";
+
+                        string resolvedVersion = string.IsNullOrWhiteSpace(entry.version)
+                            ? entry.id.ToString()
+                            : entry.version;
 
                         var installation = new EngineInstallation() {
-                            Name = item["id"]?.ToString() ?? "Unknown",
-                            Version = item["version"]?.ToString() ?? "0.0.0",
-                            InstallSize = parsedSize,
+                            Name = resolvedVersion,
+                            Version = resolvedVersion,
+                            InstallSize = entry.size,
                             Branch = branch
                         };
+
                         installations.Add(installation);
+                        _versionToEntryMap[installation] = entry;
                     }
                 }
 
                 return installations;
             }
         }
-        catch (Exception) {
+        catch (Exception ex) {
+            Debug.WriteLine($"[FetchEngineVersions] Error fetching versions: {ex.Message}");
             return new List<EngineInstallation>();
         }
     }
 
+    /// <summary>
+    /// Filter list of engine entries
+    /// </summary>
     private void ApplyEngineFilter() {
         var filteredList = _allAvailableEngineInstallations
-            .Where(x => (AllowDevBuilds && ShowDevBuilds) || !x.Branch.Equals("dev", StringComparison.OrdinalIgnoreCase))
+            .Where(x => {
+                bool isDev = x.Branch.Equals("dev", StringComparison.OrdinalIgnoreCase);
+                return (AllowDevBuilds && ShowDevBuilds) || !isDev;
+            })
             .ToList();
 
         EngineInstallations = new ObservableCollection<EngineInstallation>(filteredList);
@@ -300,6 +426,10 @@ public partial class InstallationsViewModel : ViewModelBase {
         }
     }
 
+    /// <summary>
+    /// Returns engine download suffix depending on current operating system
+    /// </summary>
+    /// <returns></returns>
     private static string GetCurrentPlatform() {
         if (OperatingSystem.IsWindows()) return "windows";
         if (OperatingSystem.IsMacOS()) return "macos-arm";

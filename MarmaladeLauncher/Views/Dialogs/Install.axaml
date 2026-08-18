@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:MarmaladeLauncher.ViewModels"
-             xmlns:models="clr-namespace:MarmaladeLauncher.Models;assembly=Common"
              xmlns:localisation="clr-namespace:Common.Assets.Localisation;assembly=MarmaladeLauncher.Common"
              xmlns:models1="clr-namespace:MarmaladeLauncher.Models;assembly=MarmaladeLauncher.Common"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -43,7 +42,8 @@
                          Margin="0,0,10,0"
                          ItemsSource="{Binding EngineInstallations}"
                          SelectedItem="{Binding SelectedEngineToInstall, Mode=TwoWay}"
-                         Background="Transparent">
+                         Background="Transparent"
+                         IsEnabled="{Binding !IsInstalling}">
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="models1:EngineInstallation">
                             <Grid ColumnDefinitions="*, Auto">
@@ -63,12 +63,19 @@
                         Background="{DynamicResource SystemControlBackgroundChromeLowBrush}"
                         CornerRadius="6"
                         IsVisible="{Binding SelectedEngineToInstall, Converter={x:Static ObjectConverters.IsNotNull}}">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="{Binding SelectedEngineToInstall.Name}" FontSize="18" FontWeight="Bold" />
-                        <TextBlock Text="{Binding SelectedEngineToInstall.Version, StringFormat='Version: {0}'}" />
-                        <TextBlock Text="{Binding SelectedEngineToInstall.FormattedInstallSize, StringFormat='Size: {0}'}" />
-                        <TextBlock Text="{Binding SelectedEngineToInstall.Branch, StringFormat='Branch: {0}'}" />
-                    </StackPanel>
+                    <Grid RowDefinitions="*, Auto">
+                        <StackPanel Grid.Row="0" Spacing="8">
+                            <TextBlock Text="{Binding SelectedEngineToInstall.Name}" FontSize="18" FontWeight="Bold" />
+                            <TextBlock Text="{Binding SelectedEngineToInstall.Version, StringFormat='Version: {0}'}" />
+                            <TextBlock Text="{Binding SelectedEngineToInstall.FormattedInstallSize, StringFormat='Size: {0}'}" />
+                            <TextBlock Text="{Binding SelectedEngineToInstall.Branch, StringFormat='Branch: {0}'}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Spacing="4" IsVisible="{Binding IsInstalling}">
+                            <TextBlock Text="Downloading and Installing..." FontSize="12" Foreground="Gray" />
+                            <ProgressBar Minimum="0" Maximum="100" Value="{Binding DownloadProgress}" Height="8" />
+                        </StackPanel>
+                    </Grid>
                 </Border>
 
                 <Border Grid.Column="1"
@@ -89,11 +96,20 @@
                           Content="{x:Static localisation:Resources.Installations_FilterDevBuilds}"
                           IsChecked="{Binding ShowDevBuilds, Mode=TwoWay}"
                           VerticalAlignment="Center"
+                          IsEnabled="{Binding !IsInstalling}"
                           IsVisible="{Binding AllowDevBuilds}" />
 
-                <Button Grid.Column="1"
-                        Content="Close"
-                        Command="{Binding $parent[UserControl;1].((vm:InstallationsViewModel)DataContext).CloseInstallCommand}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                    <Button Content="Close"
+                            IsEnabled="{Binding !IsInstalling}"
+                            Command="{Binding CloseInstallCommand}" />
+
+                    <Button Content="Install"
+                            Classes="accent"
+                            Command="{Binding InstallEngineCommand}"
+                            IsEnabled="{Binding !IsInstalling}"
+                            IsVisible="{Binding SelectedEngineToInstall, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                </StackPanel>
             </Grid>
         </Grid>
     </Border>

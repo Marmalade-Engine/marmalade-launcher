@@ -24,14 +24,11 @@ namespace Common.Assets.Localisation {
         internal Resources() {
         }
         
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        public static System.Resources.ResourceManager ResourceManager {
             get {
-                if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager(
-                        "MarmaladeLauncher.Common.Assets.Localisation.Resources", 
-                        typeof(Resources).Assembly
-                    );
+                if (object.Equals(null, resourceMan)) {
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("MarmaladeLauncher.Common.Assets.Localisation.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -141,6 +138,12 @@ namespace Common.Assets.Localisation {
         public static string Modal_Installation_CommandLineArguments {
             get {
                 return ResourceManager.GetString("Modal.Installation.CommandLineArguments", resourceCulture);
+            }
+        }
+        
+        public static string Modal_Installation_Uninstall {
+            get {
+                return ResourceManager.GetString("Modal.Installation.Uninstall", resourceCulture);
             }
         }
         

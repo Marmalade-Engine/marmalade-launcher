@@ -53,14 +53,21 @@
                                                                FontWeight="SemiBold"/>
                                                 </Border>
                                                 
-                                                <Border Background="{DynamicResource SystemAccentColor}" 
+                                                <TextBlock Text="{Binding FormattedInstallSize, StringFormat='Size: {0}'}"
+                                                           Foreground="Gray" 
+                                                           FontSize="11" 
+                                                           FontWeight="SemiBold"
+                                                           VerticalAlignment="Center"/>
+                                                
+                                                <Border Background="Crimson" 
                                                         CornerRadius="4" 
                                                         Padding="6,2" 
-                                                        VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding InstallSize}"
+                                                        VerticalAlignment="Center"
+                                                        IsVisible="{Binding IsMissing}">
+                                                    <TextBlock Text="Executable Missing" 
                                                                Foreground="White" 
                                                                FontSize="11" 
-                                                               FontWeight="SemiBold"/>
+                                                               FontWeight="Bold"/>
                                                 </Border>
                                             </StackPanel>
 
@@ -76,7 +83,7 @@
                                                     VerticalAlignment="Center">
 
                                             <Button Content="{x:Static localisation:Resources.Installations_Remove}"
-                                                    Background="Red"
+                                                    Background="DarkSlateBlue"
                                                     Foreground="White"
                                                     Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).RemoveInstallationCommand}"
                                                     CommandParameter="{Binding}"/>
@@ -87,6 +94,7 @@
                                             
                                             <Button Content="{x:Static localisation:Resources.Installations_Launch}"
                                                     Classes="accent"
+                                                    IsEnabled="{Binding IsExecutableValid}"
                                                     Command="{Binding #RootPage.((vm:InstallationsViewModel)DataContext).LaunchInstallationCommand}"
                                                     CommandParameter="{Binding}"/>
                                         </StackPanel>
