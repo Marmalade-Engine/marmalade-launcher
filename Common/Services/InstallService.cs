@@ -362,9 +362,7 @@ public class InstallService {
 
             if (File.Exists(innerBinaryPath)) {
                 SetUnixExecutablePermissions(innerBinaryPath);
-
-                await RunProcess("/usr/bin/xattr", $"-rd com.apple.quarantine \"{destinationAppPath}\"");
-
+                
                 return innerBinaryPath;
             }
 
