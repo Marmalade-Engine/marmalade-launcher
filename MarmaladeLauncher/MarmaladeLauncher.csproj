@@ -30,6 +30,16 @@
       <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Assets\icon.ico">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <AvaloniaResource Include="Assets/**" />
+    </ItemGroup>
+
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <PublishTrimmed>true</PublishTrimmed>
         <TrimMode>partial</TrimMode>
