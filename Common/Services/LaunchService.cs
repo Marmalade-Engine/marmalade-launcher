@@ -65,23 +65,27 @@ public class LaunchService {
     private ProcessStartInfo CreateMacDetachedStartInfo(EngineInstallation item, string resolvedPath,
         string combinedArgs, string defaultLocation) {
         string appBundlePath = GetMacAppBundlePath(resolvedPath);
-        string workingDir = !string.IsNullOrEmpty(appBundlePath)
-            ? Path.GetDirectoryName(appBundlePath) ?? string.Empty
-            : Path.GetDirectoryName(resolvedPath) ?? string.Empty;
 
         if (!string.IsNullOrEmpty(appBundlePath)) {
-            string args = $"-W -n {appBundlePath}";
-            if (!string.IsNullOrWhiteSpace(combinedArgs)) {
-                args += $" --args {combinedArgs}";
-            }
-
-            return new ProcessStartInfo {
+            var startInfo = new ProcessStartInfo {
                 FileName = "/usr/bin/open",
-                Arguments = args,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                WorkingDirectory = workingDir
+                WorkingDirectory = Path.GetDirectoryName(appBundlePath) ?? string.Empty
             };
+            
+            startInfo.ArgumentList.Add("-n");
+            startInfo.ArgumentList.Add("-a");
+            startInfo.ArgumentList.Add(appBundlePath);
+
+            string finalArgs = string.IsNullOrWhiteSpace(combinedArgs) 
+                ? "-ApplePersistenceIgnoreState YES" 
+                : $"{combinedArgs} -ApplePersistenceIgnoreState YES";
+
+            startInfo.ArgumentList.Add("--args");
+            startInfo.ArgumentList.Add(finalArgs);
+
+            return startInfo;
         }
 
         return new ProcessStartInfo {
@@ -89,10 +93,10 @@ public class LaunchService {
             Arguments = combinedArgs,
             UseShellExecute = false,
             CreateNoWindow = true,
-            WorkingDirectory = workingDir
+            WorkingDirectory = Path.GetDirectoryName(resolvedPath) ?? string.Empty
         };
     }
-
+    
     private ProcessStartInfo CreateLinuxDetachedStartInfo(string resolvedPath, string combinedArgs) {
         string workingDir = Path.GetDirectoryName(resolvedPath) ?? string.Empty;
         string binaryArgs = string.IsNullOrWhiteSpace(combinedArgs) ? "" : $" {combinedArgs}";
