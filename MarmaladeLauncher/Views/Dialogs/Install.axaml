@@ -20,13 +20,13 @@
         <Grid RowDefinitions="Auto, *, Auto">
 
             <TextBlock Grid.Row="0"
-                       Text="New Install"
+                       Text="{x:Static localisation:Resources.Modal_NewInstall_NewInstall}"
                        FontSize="18"
                        FontWeight="Bold"
                        Margin="0,0,0,15" />
 
             <TextBlock Grid.Row="1"
-                       Text="There are no installs available. Please try again later"
+                       Text="{x:Static localisation:Resources.Modal_NewInstall_NoAvailableInstalls}"
                        FontSize="18"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
@@ -72,7 +72,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Row="1" Spacing="4" IsVisible="{Binding IsInstalling}">
-                            <TextBlock Text="Downloading and Installing..." FontSize="12" Foreground="Gray" />
+                            <TextBlock Text="{x:Static localisation:Resources.Modal_NewInstall_DownloadingPrompt}" FontSize="12" Foreground="Gray" />
                             <ProgressBar Minimum="0" Maximum="100" Value="{Binding DownloadProgress}" Height="8" />
                         </StackPanel>
                     </Grid>
@@ -84,7 +84,7 @@
                         Background="{DynamicResource SystemControlBackgroundChromeLowBrush}"
                         CornerRadius="6"
                         IsVisible="{Binding SelectedEngineToInstall, Converter={x:Static ObjectConverters.IsNull}}">
-                    <TextBlock Text="Select an installation from the list to view details"
+                    <TextBlock Text="{x:Static localisation:Resources.Modal_NewInstall_SelectPrompt}"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
@@ -100,11 +100,11 @@
                           IsVisible="{Binding AllowDevBuilds}" />
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
-                    <Button Content="Close"
+                    <Button Content="{x:Static localisation:Resources.Generic_Cancel}"
                             IsEnabled="{Binding !IsInstalling}"
                             Command="{Binding CloseInstallCommand}" />
 
-                    <Button Content="Install"
+                    <Button Content="{x:Static localisation:Resources.Modal_NewInstall_Install}"
                             Classes="accent"
                             Command="{Binding InstallEngineCommand}"
                             IsEnabled="{Binding !IsInstalling}"

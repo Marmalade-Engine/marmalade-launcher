@@ -45,6 +45,54 @@ namespace Common.Assets.Localisation {
             }
         }
         
+        public static string Generic_OK {
+            get {
+                return ResourceManager.GetString("Generic.OK", resourceCulture);
+            }
+        }
+        
+        public static string Generic_Cancel {
+            get {
+                return ResourceManager.GetString("Generic.Cancel", resourceCulture);
+            }
+        }
+        
+        public static string Generic_Yes {
+            get {
+                return ResourceManager.GetString("Generic.Yes", resourceCulture);
+            }
+        }
+        
+        public static string Generic_No {
+            get {
+                return ResourceManager.GetString("Generic.No", resourceCulture);
+            }
+        }
+        
+        public static string Generic_Save {
+            get {
+                return ResourceManager.GetString("Generic.Save", resourceCulture);
+            }
+        }
+        
+        public static string Generic_Close {
+            get {
+                return ResourceManager.GetString("Generic.Close", resourceCulture);
+            }
+        }
+        
+        public static string Generic_Browse {
+            get {
+                return ResourceManager.GetString("Generic.Browse", resourceCulture);
+            }
+        }
+        
+        public static string Application_Title {
+            get {
+                return ResourceManager.GetString("Application.Title", resourceCulture);
+            }
+        }
+        
         public static string Toolbar_Projects {
             get {
                 return ResourceManager.GetString("Toolbar.Projects", resourceCulture);
@@ -87,6 +135,12 @@ namespace Common.Assets.Localisation {
             }
         }
         
+        public static string Installations_MissingExecutable {
+            get {
+                return ResourceManager.GetString("Installations.MissingExecutable", resourceCulture);
+            }
+        }
+        
         public static string Installations_Remove {
             get {
                 return ResourceManager.GetString("Installations.Remove", resourceCulture);
@@ -123,6 +177,36 @@ namespace Common.Assets.Localisation {
             }
         }
         
+        public static string Modal_NewInstall_NewInstall {
+            get {
+                return ResourceManager.GetString("Modal.NewInstall.NewInstall", resourceCulture);
+            }
+        }
+        
+        public static string Modal_NewInstall_NoAvailableInstalls {
+            get {
+                return ResourceManager.GetString("Modal.NewInstall.NoAvailableInstalls", resourceCulture);
+            }
+        }
+        
+        public static string Modal_NewInstall_DownloadingPrompt {
+            get {
+                return ResourceManager.GetString("Modal.NewInstall.DownloadingPrompt", resourceCulture);
+            }
+        }
+        
+        public static string Modal_NewInstall_SelectPrompt {
+            get {
+                return ResourceManager.GetString("Modal.NewInstall.SelectPrompt", resourceCulture);
+            }
+        }
+        
+        public static string Modal_NewInstall_Install {
+            get {
+                return ResourceManager.GetString("Modal.NewInstall.Install", resourceCulture);
+            }
+        }
+        
         public static string Modal_Installation_Settings {
             get {
                 return ResourceManager.GetString("Modal.Installation.Settings", resourceCulture);
@@ -147,18 +231,6 @@ namespace Common.Assets.Localisation {
             }
         }
         
-        public static string Modal_Installation_Save {
-            get {
-                return ResourceManager.GetString("Modal.Installation.Save", resourceCulture);
-            }
-        }
-        
-        public static string Modal_Installation_Close {
-            get {
-                return ResourceManager.GetString("Modal.Installation.Close", resourceCulture);
-            }
-        }
-        
         public static string Settings_Header {
             get {
                 return ResourceManager.GetString("Settings.Header", resourceCulture);
@@ -174,12 +246,6 @@ namespace Common.Assets.Localisation {
         public static string Settings_DefaultEngineInstallPath {
             get {
                 return ResourceManager.GetString("Settings.DefaultEngineInstallPath", resourceCulture);
-            }
-        }
-        
-        public static string Settings_BrowsePrompt {
-            get {
-                return ResourceManager.GetString("Settings.BrowsePrompt", resourceCulture);
             }
         }
         
@@ -240,18 +306,6 @@ namespace Common.Assets.Localisation {
         public static string Settings_LanguagePartialSupport {
             get {
                 return ResourceManager.GetString("Settings.LanguagePartialSupport", resourceCulture);
-            }
-        }
-        
-        public static string Settings_SaveSettings {
-            get {
-                return ResourceManager.GetString("Settings.SaveSettings", resourceCulture);
-            }
-        }
-        
-        public static string Settings_CancelChanges {
-            get {
-                return ResourceManager.GetString("Settings.CancelChanges", resourceCulture);
             }
         }
     }

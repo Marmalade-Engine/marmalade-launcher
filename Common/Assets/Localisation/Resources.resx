@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <root>
     <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:element name="root" msdata:IsDataSet="true">
-            
         </xsd:element>
     </xsd:schema>
     <resheader name="resmimetype">
@@ -19,6 +17,18 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
 
+    <comment>Generic</comment>
+    <data name="Generic.OK" xml:space="preserve">OK</data>
+    <data name="Generic.Cancel" xml:space="preserve">Cancel</data>
+    <data name="Generic.Yes" xml:space="preserve">Yes</data>
+    <data name="Generic.No" xml:space="preserve">No</data>
+    <data name="Generic.Save" xml:space="preserve">Save</data>
+    <data name="Generic.Close" xml:space="preserve">Close</data>
+    <data name="Generic.Browse" xml:space="preserve">Browse...</data>
+
+    <comment>Application</comment>
+    <data name="Application.Title" xml:space="default">Marmalade Launcher</data>
+
     <comment>Toolbar</comment>
     <data name="Toolbar.Projects" xml:space="preserve">Projects</data>
     <data name="Toolbar.Installations" xml:space="preserve">Installations</data>
@@ -31,45 +41,39 @@
     <comment>Installations View</comment>
     <data name="Installations.Header" xml:space="preserve">Installations</data>
     <data name="Installations.NoInstallsWarning" xml:space="preserve">You do not have any versions of Marmalade installed</data>
-    
+    <data name="Installations.MissingExecutable" xml:space="preserve">Missing Executable</data>
     <data name="Installations.Remove" xml:space="preserve">Remove</data>
     <data name="Installations.Settings" xml:space="preserve">Settings</data>
     <data name="Installations.Launch" xml:space="preserve">Launch</data>
-    
     <data name="Installations.Locate" xml:space="preserve">Locate existing</data>
     <data name="Installations.Install" xml:space="preserve">Install</data>
-
     <data name="Installations.FilterDevBuilds" xml:space="default">Filter Dev Builds</data>
+
+    <comment>New Installation Modal</comment>
+    <data name="Modal.NewInstall.NewInstall" xml:space="preserve">New Install</data>
+    <data name="Modal.NewInstall.NoAvailableInstalls" xml:space="preserve">There are no installs available. Please try again later</data>
+    <data name="Modal.NewInstall.DownloadingPrompt" xml:space="preserve">Downloading and Installing...</data>
+    <data name="Modal.NewInstall.SelectPrompt" xml:space="preserve">Select an installation from the list to view details</data>
+    <data name="Modal.NewInstall.Install" xml:space="preserve">Install</data>
 
     <comment>Installation Settings Modal</comment>
     <data name="Modal.Installation.Settings" xml:space="preserve">Installation Settings</data>
     <data name="Modal.Installation.ExecutablePath" xml:space="preserve">Executable Path</data>
     <data name="Modal.Installation.CommandLineArguments" xml:space="preserve">Additional Command Line Arguments</data>
     <data name="Modal.Installation.Uninstall" xml:space="preserve">Uninstall</data>
-    <data name="Modal.Installation.Save" xml:space="preserve">Save</data>
-    <data name="Modal.Installation.Close" xml:space="preserve">Close</data>
 
     <comment>Settings View</comment>
-
     <data name="Settings.Header" xml:space="preserve">Settings</data>
     <data name="Settings.EngineSettings" xml:space="preserve">Engine Settings</data>
     <data name="Settings.DefaultEngineInstallPath" xml:space="preserve">Default Engine Installation Path</data>
-    <data name="Settings.BrowsePrompt" xml:space="preserve">Browse...</data>
     <data name="Settings.ResetPath" xml:space="preserve">Reset</data>
     <data name="Settings.ResetPathTooltip" xml:space="preserve">Reset path back to launcher default location</data>
-    
     <data name="Settings.LauncherSettings" xml:space="preserve">Launcher Settings</data>
     <data name="Settings.PostLaunchBehaviour" xml:space="preserve">When an engine launches:</data>
     <data name="Settings.PostLaunch_KeepOpen" xml:space="preserve">Keep launcher open</data>
     <data name="Settings.PostLaunch_Minimise" xml:space="preserve">Minimise launcher</data>
     <data name="Settings.PostLaunch_Close" xml:space="preserve">Close launcher</data>
-
     <data name="Settings.EnableDevBuilds" xml:space="default">Enable Development Builds</data>
-
     <data name="Settings.Language" xml:space="preserve">Language</data>
     <data name="Settings.LanguagePartialSupport" xml:space="preserve">Partial Support</data>
-
-    <data name="Settings.SaveSettings" xml:space="preserve">Save</data>
-    <data name="Settings.CancelChanges" xml:space="preserve">Cancel</data>
-
 </root>

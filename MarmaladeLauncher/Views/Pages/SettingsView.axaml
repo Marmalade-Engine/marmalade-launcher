@@ -28,7 +28,7 @@
                              Width="380"
                              VerticalAlignment="Center" />
 
-                    <Button Content="{x:Static localisation:Resources.Settings_BrowsePrompt}"
+                    <Button Content="{x:Static localisation:Resources.Generic_Browse}"
                             Command="{Binding BrowseFolderCommand}"
                             VerticalAlignment="Center" />
 
@@ -103,11 +103,11 @@
                     HorizontalAlignment="Right"
                     Spacing="10"
                     IsVisible="{Binding IsDirty}">
-            <Button Content="{x:Static localisation:Resources.Settings_CancelChanges}"
+            <Button Content="{x:Static localisation:Resources.Generic_Cancel}"
                     Command="{Binding CancelCommand}"
                     Width="90"
                     HorizontalContentAlignment="Center" />
-            <Button Content="{x:Static localisation:Resources.Settings_SaveSettings}"
+            <Button Content="{x:Static localisation:Resources.Generic_Save}"
                     Command="{Binding SaveCommand}"
                     Width="90"
                     HorizontalContentAlignment="Center"

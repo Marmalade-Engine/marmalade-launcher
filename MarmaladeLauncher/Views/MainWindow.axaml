@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:components="clr-namespace:MarmaladeLauncher.Views.Components"
         xmlns:pages="clr-namespace:MarmaladeLauncher.Views.Pages"
+        xmlns:localisation="clr-namespace:Common.Assets.Localisation;assembly=MarmaladeLauncher.Common"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="MarmaladeLauncher.Views.MainWindow"
         x:DataType="vm:MainViewModel"
-        Title="Marmalade Launcher"
+        Title="{x:Static localisation:Resources.Application_Title}"
         Icon="/Assets/icon.ico">
     
     <Window.DataTemplates>
