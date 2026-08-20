@@ -20,7 +20,7 @@
 
             <StackPanel Spacing="5">
                 <TextBlock Text="{x:Static localisation:Resources.Modal_Installation_ExecutablePath}" FontSize="12" Foreground="Gray"/>
-                <TextBox Text="{Binding ExecutablePath}" IsReadOnly="True" />
+                <TextBox Text="{Binding ExecutablePath}" IsReadOnly="False" />
             </StackPanel>
 
             <StackPanel Spacing="5">

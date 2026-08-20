@@ -101,26 +101,21 @@ public class InstallService {
     }
 
     /// <summary>
-    /// Get relative exec path
+    /// Get relative exec path relative to the base target directory
     /// </summary>
-    /// <param name="baseTargetDir"></param>
-    /// <param name="absExecPath"></param>
-    /// <returns></returns>
     private string GetRelativeInstallPath(string baseTargetDir, string absExecPath) {
-        string pathTarget = absExecPath;
-        int appIndex = pathTarget.IndexOf(".app", StringComparison.OrdinalIgnoreCase);
-        if (appIndex != -1) {
-            pathTarget = pathTarget.Substring(0, appIndex + 4);
-        }
+        try {
+            var fullBaseDir = Path.GetFullPath(baseTargetDir);
+            var fullAbsPath = Path.GetFullPath(absExecPath);
 
-        string? parentDir =
-            Path.GetDirectoryName(baseTargetDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-        if (!string.IsNullOrEmpty(parentDir)) {
-            string relative = Path.GetRelativePath(parentDir, pathTarget);
-            return relative.Replace('\\', '/');
-        }
+            string relativePath = Path.GetRelativePath(fullBaseDir, fullAbsPath);
 
-        return pathTarget.Replace('\\', '/');
+            return relativePath.Replace('\\', '/');
+        }
+        catch (ArgumentException) {
+            Console.WriteLine("Error calculating relative path. Using absolute fallback.");
+            return Path.GetFileName(absExecPath);
+        }
     }
 
     /// <summary>
@@ -184,26 +179,25 @@ public class InstallService {
     private async Task UninstallWindowsEngine(string execPath) {
         throw new NotImplementedException();
     }
-    
+
     /// <summary>
     /// Perform MacOS-specific engine uninstallation process
     /// </summary>
     private async Task UninstallMacEngine(string execPath) {
         string? appBundleDir = GetContainingAppBundle(execPath);
-        string rootDirToDir = appBundleDir ?? Path.GetDirectoryName(execPath)!;
+        string rootDir = appBundleDir ?? Path.GetDirectoryName(execPath)!;
 
-        string? parentDir = Path.GetDirectoryName(rootDirToDir);
+        string? installDirectory = Path.GetDirectoryName(rootDir);
 
-        if (Directory.Exists(rootDirToDir)) {
-            Directory.Delete(rootDirToDir, true);
+        if (!string.IsNullOrEmpty(installDirectory) &&
+            File.Exists(Path.Combine(installDirectory, "install_info.json"))) {
+            Directory.Delete(installDirectory, recursive: true);
+        }
+        else if (Directory.Exists(rootDir)) {
+            Directory.Delete(rootDir, recursive: true);
         }
         else if (File.Exists(execPath)) {
             File.Delete(execPath);
-        }
-
-        if (!string.IsNullOrEmpty(parentDir) && Directory.Exists(parentDir) &&
-            Directory.GetFileSystemEntries(parentDir).Length == 0) {
-            Directory.Delete(parentDir, recursive: true);
         }
 
         await Task.CompletedTask;
@@ -358,18 +352,25 @@ public class InstallService {
             }
 
             string bundleNameWithoutExt = Path.GetFileNameWithoutExtension(appName);
-            string innerBinaryPath = Path.Combine(destinationAppPath, "Contents", "MacOS", bundleNameWithoutExt);
-            
             string macOsDir = Path.Combine(destinationAppPath, "Contents", "MacOS");
+            string? executableBinaryPath = null;
+
             if (Directory.Exists(macOsDir)) {
                 var files = Directory.GetFiles(macOsDir);
                 if (files.Length > 0) {
-                    SetUnixExecutablePermissions(files[0]);
-                    return files[0];
+                    executableBinaryPath = Path.Combine(macOsDir, files[0]);
                 }
             }
 
-            return destinationAppPath;
+            if (executableBinaryPath != null && File.Exists(executableBinaryPath)) {
+                SetUnixExecutablePermissions(executableBinaryPath);
+                return executableBinaryPath;
+            }
+            else {
+                Console.WriteLine(
+                    $"Warning: Could not locate definitive executable binary for {appName}. Returning the entire .app bundle.");
+                return destinationAppPath;
+            }
         }
         finally {
             await RunProcess("/usr/bin/hdiutil", $"detach \"{mountPoint}\" -force -quiet");
@@ -406,7 +407,7 @@ public class InstallService {
 
         return (process.ExitCode, output, error);
     }
-    
+
     /// <summary>
     /// Infer file extenssion from url
     /// </summary>

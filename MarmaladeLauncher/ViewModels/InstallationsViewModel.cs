@@ -95,7 +95,14 @@ public partial class InstallationsViewModel : ViewModelBase {
         }
 
         Installations = new ObservableCollection<EngineInstallation>(list);
-        _allAvailableEngineInstallations = await FetchEngineVersions();
+
+        var (remoteInstallations, map) = await _installationService.FetchEngineVersionsAsync();
+        _allAvailableEngineInstallations = remoteInstallations;
+
+        _versionToEntryMap.Clear();
+        foreach (var kvp in map) {
+            _versionToEntryMap[kvp.Key] = kvp.Value;
+        }
 
         ApplyEngineFilter();
         UpdateState();
@@ -174,7 +181,7 @@ public partial class InstallationsViewModel : ViewModelBase {
             fileTypes.Add(FilePickerFileTypes.All);
 
             var options = new FilePickerOpenOptions {
-                Title = "Locate existing installation",
+                Title = "Locate existing installation", //TODO: LOCALISE THIS STRING
                 AllowMultiple = false,
                 FileTypeFilter = fileTypes
             };
@@ -206,7 +213,7 @@ public partial class InstallationsViewModel : ViewModelBase {
         }
 
         // prevent duplicate entries
-        bool isAlreadyRegistered = Installations.Any(i => 
+        bool isAlreadyRegistered = Installations.Any(i =>
             i.ExecutablePath.Equals(executablePath, StringComparison.OrdinalIgnoreCase));
 
         if (isAlreadyRegistered) {
@@ -240,7 +247,7 @@ public partial class InstallationsViewModel : ViewModelBase {
 
         await _installationService.SaveInstallations(Installations);
     }
-    
+
     /// <summary>
     /// Validates and launches a target engine installation
     /// </summary>
@@ -295,7 +302,7 @@ public partial class InstallationsViewModel : ViewModelBase {
             }
         }
     }
-    
+
     [RelayCommand]
     private void OpenSettings(EngineInstallation item) {
         if (item == null) return;
@@ -352,59 +359,6 @@ public partial class InstallationsViewModel : ViewModelBase {
         var dialog = MessageBoxManager.GetMessageBoxStandard(title, message, ButtonEnum.YesNo);
         var result = await dialog.ShowWindowDialogAsync(parent);
         return result == ButtonResult.Yes;
-    }
-
-    private async Task<List<EngineInstallation>> FetchEngineVersions() {
-        string currentPlatform = GetCurrentPlatform();
-        string requestUri = EngineDownloadsURI;
-
-        try {
-            using (var client = new HttpClient()) {
-                client.Timeout = TimeSpan.FromSeconds(10);
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("MarmaladeLauncher/1.0");
-
-                string jsonResponse = await client.GetStringAsync(requestUri);
-                var installations = new List<EngineInstallation>();
-                var jsonNode = JsonNode.Parse(jsonResponse);
-
-                if (jsonNode?["builds"] is JsonArray buildsArray) {
-                    var serializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                    var entries = buildsArray.Deserialize<List<InstallationEntry>>(serializerOptions) ?? new();
-
-                    foreach (var entry in entries) {
-                        if (!string.IsNullOrEmpty(entry.url) &&
-                            !entry.url.Contains($"platform={currentPlatform}", StringComparison.OrdinalIgnoreCase)) {
-                            continue;
-                        }
-
-                        string branch = (!string.IsNullOrEmpty(entry.url) &&
-                                         entry.url.Contains("branch=dev", StringComparison.OrdinalIgnoreCase))
-                            ? "dev"
-                            : "release";
-
-                        string resolvedVersion = string.IsNullOrWhiteSpace(entry.version)
-                            ? entry.id.ToString()
-                            : entry.version;
-
-                        var installation = new EngineInstallation() {
-                            Name = resolvedVersion,
-                            Version = resolvedVersion,
-                            InstallSize = entry.size,
-                            Branch = branch
-                        };
-
-                        installations.Add(installation);
-                        _versionToEntryMap[installation] = entry;
-                    }
-                }
-
-                return installations;
-            }
-        }
-        catch (Exception ex) {
-            Debug.WriteLine($"Error fetching versions: {ex.Message}");
-            return new List<EngineInstallation>();
-        }
     }
 
     /// <summary>
