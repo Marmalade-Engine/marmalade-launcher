@@ -46,8 +46,11 @@
     <data name="Installations.Settings" xml:space="preserve">Settings</data>
     <data name="Installations.Launch" xml:space="preserve">Launch</data>
     <data name="Installations.Locate" xml:space="preserve">Locate existing</data>
+    <data name="Installation.Locate.FilePicker" xml:space="preserve">Locate existing installation</data>
     <data name="Installations.Install" xml:space="preserve">Install</data>
-    <data name="Installations.FilterDevBuilds" xml:space="default">Filter Dev Builds</data>
+    <data name="Installations.FilterDevBuilds" xml:space="default">Show Dev Builds</data>
+    <data name="Installations.MissingExecutable.Prompt.Title" xml:space="preserve">Missing Executable</data>
+    <data name="Installations.MissingExecutable.Prompt.Body" xml:space="preserve">Cannot launch {0}. The executable was moved or deleted:&#10;{1}</data>
 
     <comment>New Installation Modal</comment>
     <data name="Modal.NewInstall.NewInstall" xml:space="preserve">New Install</data>
@@ -61,6 +64,8 @@
     <data name="Modal.Installation.ExecutablePath" xml:space="preserve">Executable Path</data>
     <data name="Modal.Installation.CommandLineArguments" xml:space="preserve">Additional Command Line Arguments</data>
     <data name="Modal.Installation.Uninstall" xml:space="preserve">Uninstall</data>
+    <data name="Modal.Installation.Uninstall.Prompt.Title" xml:space="preserve">Confirm Uninstallation</data>
+    <data name="Modal.Installation.Uninstall.Prompt.Body" xml:space="preserve">Are you sure you want to uninstall {0}?</data>
 
     <comment>Settings View</comment>
     <data name="Settings.Header" xml:space="preserve">Settings</data>

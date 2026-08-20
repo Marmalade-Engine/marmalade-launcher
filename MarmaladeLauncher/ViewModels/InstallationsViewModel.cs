@@ -13,6 +13,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
+using Common.Assets.Localisation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MarmaladeLauncher.Models;
@@ -181,7 +182,7 @@ public partial class InstallationsViewModel : ViewModelBase {
             fileTypes.Add(FilePickerFileTypes.All);
 
             var options = new FilePickerOpenOptions {
-                Title = "Locate existing installation", //TODO: LOCALISE THIS STRING
+                Title = Resources.Installation_Locate_FilePicker,
                 AllowMultiple = false,
                 FileTypeFilter = fileTypes
             };
@@ -262,8 +263,8 @@ public partial class InstallationsViewModel : ViewModelBase {
                 && desktop.MainWindow != null) {
                 string resolvedPath = item.GetResolvedExecutablePath(_settingsService.Settings.DefaultInstallLocation);
                 var box = MessageBoxManager.GetMessageBoxStandard(
-                    "Executable Missing",
-                    $"Cannot launch {item.Name}. The executable was moved or deleted:\n{resolvedPath}",
+                    Resources.Installations_MissingExecutable_Prompt_Title,
+                    string.Format(Resources.Installations_MissingExecutable_Prompt_Body, item.Name, resolvedPath),
                     ButtonEnum.Ok);
                 await box.ShowWindowDialogAsync(desktop.MainWindow);
             }
@@ -340,8 +341,8 @@ public partial class InstallationsViewModel : ViewModelBase {
             && desktop.MainWindow != null) {
             bool confirmed = await ShowConfirmationDialog(
                 desktop.MainWindow,
-                "Confirm Uninstallation",
-                $"Are you sure you want to uninstall {item.Name}?"
+                Resources.Modal_Installation_Uninstall_Prompt_Title,
+                string.Format(Resources.Modal_Installation_Uninstall_Prompt_Body, item.Name)
             );
 
             if (confirmed) {

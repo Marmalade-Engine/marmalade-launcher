@@ -165,6 +165,12 @@ namespace Common.Assets.Localisation {
             }
         }
         
+        public static string Installation_Locate_FilePicker {
+            get {
+                return ResourceManager.GetString("Installation.Locate.FilePicker", resourceCulture);
+            }
+        }
+        
         public static string Installations_Install {
             get {
                 return ResourceManager.GetString("Installations.Install", resourceCulture);
@@ -174,6 +180,18 @@ namespace Common.Assets.Localisation {
         public static string Installations_FilterDevBuilds {
             get {
                 return ResourceManager.GetString("Installations.FilterDevBuilds", resourceCulture);
+            }
+        }
+        
+        public static string Installations_MissingExecutable_Prompt_Title {
+            get {
+                return ResourceManager.GetString("Installations.MissingExecutable.Prompt.Title", resourceCulture);
+            }
+        }
+        
+        public static string Installations_MissingExecutable_Prompt_Body {
+            get {
+                return ResourceManager.GetString("Installations.MissingExecutable.Prompt.Body", resourceCulture);
             }
         }
         
@@ -228,6 +246,18 @@ namespace Common.Assets.Localisation {
         public static string Modal_Installation_Uninstall {
             get {
                 return ResourceManager.GetString("Modal.Installation.Uninstall", resourceCulture);
+            }
+        }
+        
+        public static string Modal_Installation_Uninstall_Prompt_Title {
+            get {
+                return ResourceManager.GetString("Modal.Installation.Uninstall.Prompt.Title", resourceCulture);
+            }
+        }
+        
+        public static string Modal_Installation_Uninstall_Prompt_Body {
+            get {
+                return ResourceManager.GetString("Modal.Installation.Uninstall.Prompt.Body", resourceCulture);
             }
         }
         
