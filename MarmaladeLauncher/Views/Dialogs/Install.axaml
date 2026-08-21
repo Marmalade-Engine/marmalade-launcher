@@ -45,7 +45,7 @@
                          Background="Transparent"
                          IsEnabled="{Binding !IsInstalling}">
                     <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="models1:EngineInstallation">
+                        <DataTemplate x:DataType="models1:LocalEngineInstallation">
                             <Grid ColumnDefinitions="*, Auto">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <TextBlock Text="{Binding Version}"

@@ -1,11 +1,11 @@
-using System.Globalization;
+    using System.Globalization;
 using MarmaladeLauncher.Utils;
 
 using MarmaladeLauncher.Utils;
 
 namespace MarmaladeLauncher.Models;
 
-public class InstallationEntry {
+public class RemoteBuildEntry {
     public int id { get; set; }
     public string? name { get; set; }
     public string url { get; set; } = string.Empty; // download url

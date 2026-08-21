@@ -9,7 +9,7 @@ using MarmaladeLauncher.Models;
 
 namespace MarmaladeLauncher.Services;
 
-public class InstallationService {
+public class InstallationRegistryService {
     private const string BaseDownloadUri = "https://www.ryanbester.com/download";
 
     private static readonly HttpClient HttpClient = new() {
@@ -19,23 +19,23 @@ public class InstallationService {
     public static string InstallationsFilePath =>
         Path.Combine(SettingsService.AppDataDir, "installations.json");
 
-    static InstallationService() {
+    static InstallationRegistryService() {
         HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("MarmaladeLauncher/1.0");
     }
 
-    public async Task<List<EngineInstallation>> LoadInstallations() {
+    public async Task<List<LocalEngineInstallation>> LoadInstallations() {
         try {
-            if (!File.Exists(InstallationsFilePath)) return new List<EngineInstallation>();
+            if (!File.Exists(InstallationsFilePath)) return new List<LocalEngineInstallation>();
             string json = await File.ReadAllTextAsync(InstallationsFilePath);
-            return JsonSerializer.Deserialize<List<EngineInstallation>>(json) ?? new List<EngineInstallation>();
+            return JsonSerializer.Deserialize<List<LocalEngineInstallation>>(json) ?? new List<LocalEngineInstallation>();
         }
         catch (Exception e) {
             Console.WriteLine($"Failed to load installations: {e.Message}");
-            return new List<EngineInstallation>();
+            return new List<LocalEngineInstallation>();
         }
     }
 
-    public async Task SaveInstallations(IEnumerable<EngineInstallation> installations) {
+    public async Task SaveInstallations(IEnumerable<LocalEngineInstallation> installations) {
         try {
             string json = JsonSerializer.Serialize(installations, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(InstallationsFilePath, json);
@@ -49,15 +49,15 @@ public class InstallationService {
     /// Fetches remote engine releases for a specific platform and branch.
     /// </summary>
     public async
-        Task<(List<EngineInstallation> Installations, Dictionary<EngineInstallation, InstallationEntry> EntryMap)>
+        Task<(List<LocalEngineInstallation> Installations, Dictionary<LocalEngineInstallation, RemoteBuildEntry> EntryMap)>
         FetchEngineVersionsAsync(
             string? platform = null,
             string branch = "dev") {
         platform ??= GetCurrentPlatform();
         string requestUri = $"{BaseDownloadUri}?product=marmalade-engine&branch={branch}&platform={platform}&list";
 
-        var installations = new List<EngineInstallation>();
-        var entryMap = new Dictionary<EngineInstallation, InstallationEntry>();
+        var installations = new List<LocalEngineInstallation>();
+        var entryMap = new Dictionary<LocalEngineInstallation, RemoteBuildEntry>();
 
         try {
             string jsonResponse = await HttpClient.GetStringAsync(requestUri);
@@ -65,7 +65,7 @@ public class InstallationService {
 
             if (jsonNode?["builds"] is JsonArray buildsArray) {
                 var serializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var entries = buildsArray.Deserialize<List<InstallationEntry>>(serializerOptions) ?? new();
+                var entries = buildsArray.Deserialize<List<RemoteBuildEntry>>(serializerOptions) ?? new();
 
                 foreach (var entry in entries) {
                     if (!string.IsNullOrEmpty(entry.url) &&
@@ -91,7 +91,7 @@ public class InstallationService {
                         ? result
                         : DateTime.MinValue;
                     
-                    var installation = new EngineInstallation {
+                    var installation = new LocalEngineInstallation {
                         Name = resolvedVersion,
                         Version = resolvedVersion,
                         InstallSize = entry.size,

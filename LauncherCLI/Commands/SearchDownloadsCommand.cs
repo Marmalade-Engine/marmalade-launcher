@@ -4,16 +4,16 @@ using MarmaladeLauncher.Services;
 namespace MarmaladeLauncher.CLI.Commands;
 
 public class SearchDownloadsCommand : Command {
-    private readonly InstallationService _installationService;
+    private readonly InstallationRegistryService _installationRegistryService;
     
-    public SearchDownloadsCommand(InstallationService installationService) : base("search", "Show list of engine versions available for download") {
-        _installationService = installationService;
+    public SearchDownloadsCommand(InstallationRegistryService installationRegistryService) : base("search", "Show list of engine versions available for download") {
+        _installationRegistryService = installationRegistryService;
         
-        this.SetAction(_ => SearchAvailableEngines(_installationService));
+        this.SetAction(_ => SearchAvailableEngines(_installationRegistryService));
     }
 
-    public static async Task SearchAvailableEngines(InstallationService installationService) {
-        var (installations, _) = await installationService.FetchEngineVersionsAsync();
+    public static async Task SearchAvailableEngines(InstallationRegistryService installationRegistryService) {
+        var (installations, _) = await installationRegistryService.FetchEngineVersionsAsync();
 
         if (installations.Count == 0) {
             Console.WriteLine(

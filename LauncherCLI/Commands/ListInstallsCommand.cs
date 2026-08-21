@@ -8,14 +8,14 @@ public class ListInstallsCommand : Command {
         "Show list of installed engine versions") {
         
         this.SetAction(async _ => {
-            var installationService = new InstallationService();
+            var installationService = new InstallationRegistryService();
             
             await ListInstalls(installationService);
         });
     }
 
-    public static async Task ListInstalls(InstallationService installationService) {
-        var installations = await installationService.LoadInstallations();
+    public static async Task ListInstalls(InstallationRegistryService installationRegistryService) {
+        var installations = await installationRegistryService.LoadInstallations();
 
         if (!installations.Any()) {
             Console.WriteLine("No installations found");

@@ -12,14 +12,14 @@ using MarmaladeLauncher.Models;
 
 namespace MarmaladeLauncher.Services;
 
-public class InstallService {
+public class EngineInstallerService {
     private readonly HttpClient _httpClient;
-    private readonly InstallationService _installationService;
+    private readonly InstallationRegistryService _installationRegistryService;
     private readonly SettingsService _settingsService;
 
-    public InstallService(InstallationService installationService, SettingsService settingsService,
+    public EngineInstallerService(InstallationRegistryService installationRegistryService, SettingsService settingsService,
         HttpClient? httpClient = null) {
-        _installationService = installationService;
+        _installationRegistryService = installationRegistryService;
         _settingsService = settingsService;
         _httpClient = httpClient ?? new HttpClient();
     }
@@ -27,8 +27,8 @@ public class InstallService {
     /// <summary>
     /// Download, extract, and register a new engine build
     /// </summary>
-    public async Task<EngineInstallation?> InstallEngine(
-        InstallationEntry entry,
+    public async Task<LocalEngineInstallation?> InstallEngine(
+        RemoteBuildEntry entry,
         string targetDirectory,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default) {
@@ -57,7 +57,7 @@ public class InstallService {
                 ? entry.name
                 : $"Marmalade {resolvedVersion}";
 
-            var existingList = await _installationService.LoadInstallations();
+            var existingList = await _installationRegistryService.LoadInstallations();
 
             int duplicateCount = existingList
                 .FindAll(i => i.Version.Equals(resolvedVersion, StringComparison.OrdinalIgnoreCase)).Count;
@@ -65,7 +65,7 @@ public class InstallService {
                 displayName = $"{displayName} ({duplicateCount + 1})";
             }
 
-            var newInstall = new EngineInstallation {
+            var newInstall = new LocalEngineInstallation {
                 Name = displayName,
                 Version = resolvedVersion,
                 ExecutablePath = relativeExecutablePath,
@@ -76,7 +76,7 @@ public class InstallService {
             existingList.RemoveAll(i =>
                 i.ExecutablePath.Equals(finalExecutablePath, StringComparison.OrdinalIgnoreCase));
             existingList.Add(newInstall);
-            await _installationService.SaveInstallations(existingList);
+            await _installationRegistryService.SaveInstallations(existingList);
 
             return newInstall;
         }
@@ -121,7 +121,7 @@ public class InstallService {
     /// <summary>
     /// Terminate active instances of the target engine, remove it files in the file system, and unregister the engine
     /// </summary>
-    public async Task UninstallEngineAsync(EngineInstallation entry, IProgress<double>? progress = null,
+    public async Task UninstallEngineAsync(LocalEngineInstallation entry, IProgress<double>? progress = null,
         CancellationToken cancellationToken = default) {
         Console.WriteLine($"Uninstalling {entry.Name}...");
 
@@ -149,9 +149,9 @@ public class InstallService {
 
         progress?.Report(80.0f);
 
-        var existingList = await _installationService.LoadInstallations();
+        var existingList = await _installationRegistryService.LoadInstallations();
         existingList.RemoveAll(i => i.ExecutablePath.Equals(entry.ExecutablePath, StringComparison.OrdinalIgnoreCase));
-        await _installationService.SaveInstallations(existingList);
+        await _installationRegistryService.SaveInstallations(existingList);
 
         progress?.Report(100);
     }
@@ -255,7 +255,7 @@ public class InstallService {
     /// <summary>
     /// Handle post download file placements, extract bundles
     /// </summary>
-    private async Task<string> ProcessDownloadedFile(string filePath, string targetDirectory, InstallationEntry entry) {
+    private async Task<string> ProcessDownloadedFile(string filePath, string targetDirectory, RemoteBuildEntry entry) {
         string ext = GetExtensionFromUrl(entry.url).ToLowerInvariant();
 
         if (string.IsNullOrEmpty(ext) && RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
@@ -457,10 +457,10 @@ public class InstallService {
     /// </summary>
     private static async Task WriteInstallInfo(
         string installDir,
-        InstallationEntry entry,
+        RemoteBuildEntry entry,
         string execPath,
         string? checksum = null) {
-        var info = new InstallInfo {
+        var info = new InstallationMetadata {
             Branch = GetQueryParam(entry.url, "branch", "main"),
             Platform = GetQueryParam(entry.url, "platform", RuntimeInformation.OSDescription),
             Version = entry.ResolvedVersion,

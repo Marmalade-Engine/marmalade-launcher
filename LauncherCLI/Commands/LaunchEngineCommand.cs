@@ -6,10 +6,10 @@ public static class LaunchEngineCommand {
     public static async Task<int> Launch(
         string target,
         string[]? launchArgs,
-        InstallationService installationService,
+        InstallationRegistryService installationRegistryService,
         LaunchService launchService) {
 
-        var installations = await installationService.LoadInstallations();
+        var installations = await installationRegistryService.LoadInstallations();
         
         var engine = installations.FirstOrDefault(x =>
             x.Name.Equals(target, StringComparison.OrdinalIgnoreCase) ||

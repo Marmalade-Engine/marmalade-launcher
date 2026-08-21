@@ -5,7 +5,7 @@
              xmlns:models="using:MarmaladeLauncher.Models"
              xmlns:vm="clr-namespace:MarmaladeLauncher.ViewModels"
              xmlns:localisation="clr-namespace:Common.Assets.Localisation;assembly=MarmaladeLauncher.Common"
-             x:DataType="models:EngineInstallation"
+             x:DataType="models:LocalEngineInstallation"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MarmaladeLauncher.Views.Dialogs.InstallationSettingsWindow">
     

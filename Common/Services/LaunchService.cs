@@ -15,7 +15,7 @@ public class LaunchService {
         _settingsService = settingsService;
     }
 
-    public async Task<bool> LaunchAsync(EngineInstallation item, IEnumerable<string>? extraArgs = null,
+    public async Task<bool> LaunchAsync(LocalEngineInstallation item, IEnumerable<string>? extraArgs = null,
         Func<Task>? onPostLaunch = null) {
         if (item == null || string.IsNullOrWhiteSpace(item.ExecutablePath))
             return false;
@@ -62,7 +62,7 @@ public class LaunchService {
         }
     }
 
-    private ProcessStartInfo CreateMacDetachedStartInfo(EngineInstallation item, string resolvedPath,
+    private ProcessStartInfo CreateMacDetachedStartInfo(LocalEngineInstallation item, string resolvedPath,
         string combinedArgs, string defaultLocation) {
         string appBundlePath = GetMacAppBundlePath(resolvedPath);
 

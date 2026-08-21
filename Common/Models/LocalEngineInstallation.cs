@@ -9,7 +9,7 @@ namespace MarmaladeLauncher.Models;
 /// <summary>
 ///     Object used to define an installment of the engine that has been downloaded
 /// </summary>
-public partial class EngineInstallation : ObservableObject {
+public partial class LocalEngineInstallation : ObservableObject {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
     public string Version { get; set; } = string.Empty;
@@ -90,7 +90,6 @@ public partial class EngineInstallation : ObservableObject {
 
         string fullPath = Path.Combine(baseDir, ExecutablePath);
 
-        // Replicate Mac logic for the final resolution fallback (just in case)
         if (OperatingSystem.IsMacOS() && !File.Exists(fullPath)) {
             string macOsDir = Path.Combine(fullPath, "Contents", "MacOS");
             if (Directory.Exists(macOsDir)) {

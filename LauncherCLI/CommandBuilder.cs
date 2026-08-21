@@ -7,8 +7,8 @@ namespace MarmaladeLauncher.CLI;
 public class CommandBuilder {
     public static RootCommand CreateCommandRoot(
         SettingsService settingsService,
-        InstallationService installationService,
-        InstallService installService,
+        InstallationRegistryService installationRegistryService,
+        EngineInstallerService engineInstallerService,
         LaunchService launchService
     ) {
         var commandRoot = new RootCommand("Marmalade Launcher CLI");
@@ -16,7 +16,7 @@ public class CommandBuilder {
         var listCommand = new ListInstallsCommand();
         commandRoot.Add(listCommand);
 
-        var searchDownloadsCommand = new SearchDownloadsCommand(installationService);
+        var searchDownloadsCommand = new SearchDownloadsCommand(installationRegistryService);
         commandRoot.Add(searchDownloadsCommand);
 
         // Install Command
@@ -39,8 +39,8 @@ public class CommandBuilder {
             var skipConfirmation = parseResult.GetValue(skipConfirm);
 
             return await InstallEngineCommand.Install(
-                version, customOutputDir, search, skipConfirmation, settingsService, installationService,
-                installService);
+                version, customOutputDir, search, skipConfirmation, settingsService, installationRegistryService,
+                engineInstallerService);
         });
         commandRoot.Add(installCommand);
 
@@ -58,8 +58,8 @@ public class CommandBuilder {
             var target = parseResult.GetValue(uninstallTargetArg)!;
             var skipConfirmation = parseResult.GetValue(skipUninstallConfirmOpt);
 
-            return await UninstallEngineCommand.Uninstall(target, skipConfirmation, installationService,
-                installService);
+            return await UninstallEngineCommand.Uninstall(target, skipConfirmation, installationRegistryService,
+                engineInstallerService);
         });
         commandRoot.Add(uninstallCommand);
 
@@ -77,7 +77,7 @@ public class CommandBuilder {
             var target = parseResult.GetValue(targetArgument)!;
             var extraArgs = parseResult.GetValue(engineArgsArgument) ?? Array.Empty<string>();
 
-            await LaunchEngineCommand.Launch(target, extraArgs, installationService, launchService);
+            await LaunchEngineCommand.Launch(target, extraArgs, installationRegistryService, launchService);
         });
         commandRoot.Add(launchCommand);
 

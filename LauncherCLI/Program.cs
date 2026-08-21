@@ -7,8 +7,8 @@ namespace MarmaladeLauncher.CLI {
             settingsService.LoadSettings();
 
             var launchService = new LaunchService(settingsService);
-            var installationService = new InstallationService();
-            var installService = new InstallService(installationService, settingsService);
+            var installationService = new InstallationRegistryService();
+            var installService = new EngineInstallerService(installationService, settingsService);
 
             var commandRoot = CommandBuilder.CreateCommandRoot(
                 settingsService, installationService, installService, launchService);

@@ -25,21 +25,21 @@ using MsBox.Avalonia.Enums;
 namespace MarmaladeLauncher.ViewModels;
 
 public partial class InstallationsViewModel : ViewModelBase {
-    private readonly InstallationService _installationService;
+    private readonly InstallationRegistryService _installationRegistryService;
     private readonly SettingsService _settingsService;
     private readonly LaunchService _launchService;
-    private readonly InstallService _installService;
+    private readonly EngineInstallerService _engineInstallerService;
 
-    private readonly Dictionary<EngineInstallation, InstallationEntry> _versionToEntryMap = new();
+    private readonly Dictionary<LocalEngineInstallation, RemoteBuildEntry> _versionToEntryMap = new();
 
     [ObservableProperty] private bool _isInstalling;
     [ObservableProperty] private double _downloadProgress;
 
-    private List<EngineInstallation> _allAvailableEngineInstallations = new();
+    private List<LocalEngineInstallation> _allAvailableEngineInstallations = new();
 
-    [ObservableProperty] private ObservableCollection<EngineInstallation> _installations = new();
+    [ObservableProperty] private ObservableCollection<LocalEngineInstallation> _installations = new();
 
-    [ObservableProperty] private ObservableCollection<EngineInstallation> _engineInstallations = new();
+    [ObservableProperty] private ObservableCollection<LocalEngineInstallation> _engineInstallations = new();
 
     [ObservableProperty] private bool _hasInstallations;
 
@@ -48,9 +48,9 @@ public partial class InstallationsViewModel : ViewModelBase {
     [ObservableProperty] private bool _isInstallModalOpen;
 
     [ObservableProperty] private bool _isSettingsModalOpen;
-    [ObservableProperty] private EngineInstallation? _selectedInstallation;
+    [ObservableProperty] private LocalEngineInstallation? _selectedInstallation;
 
-    [ObservableProperty] private EngineInstallation? _selectedEngineToInstall;
+    [ObservableProperty] private LocalEngineInstallation? _selectedEngineToInstall;
 
     [ObservableProperty] private bool _allowDevBuilds;
 
@@ -59,12 +59,12 @@ public partial class InstallationsViewModel : ViewModelBase {
     private string EngineDownloadsURI =>
         $"https://www.ryanbester.com/download?product=marmalade-engine&branch=dev&platform={GetCurrentPlatform()}&list";
 
-    public InstallationsViewModel(InstallationService installationService, SettingsService settingsService,
-        LaunchService launchService, InstallService installService) {
-        _installationService = installationService;
+    public InstallationsViewModel(InstallationRegistryService installationRegistryService, SettingsService settingsService,
+        LaunchService launchService, EngineInstallerService engineInstallerService) {
+        _installationRegistryService = installationRegistryService;
         _settingsService = settingsService;
         _launchService = launchService;
-        _installService = installService;
+        _engineInstallerService = engineInstallerService;
 
         _settingsService.LoadSettings();
         AllowDevBuilds = _settingsService.Settings.EnableDevBuilds;
@@ -76,7 +76,7 @@ public partial class InstallationsViewModel : ViewModelBase {
         CreateAndLoadInstallationService(),
         CreateAndLoadSettingsService(),
         new LaunchService(CreateAndLoadSettingsService()),
-        new InstallService(CreateAndLoadInstallationService(), CreateAndLoadSettingsService())) { }
+        new EngineInstallerService(CreateAndLoadInstallationService(), CreateAndLoadSettingsService())) { }
 
     private static SettingsService CreateAndLoadSettingsService() {
         var service = new SettingsService();
@@ -84,20 +84,20 @@ public partial class InstallationsViewModel : ViewModelBase {
         return service;
     }
 
-    private static InstallationService CreateAndLoadInstallationService() {
-        return new InstallationService();
+    private static InstallationRegistryService CreateAndLoadInstallationService() {
+        return new InstallationRegistryService();
     }
 
     private async Task LoadData() {
-        var list = await _installationService.LoadInstallations();
+        var list = await _installationRegistryService.LoadInstallations();
 
         foreach (var installation in list) {
             installation.RefreshValidation();
         }
 
-        Installations = new ObservableCollection<EngineInstallation>(list);
+        Installations = new ObservableCollection<LocalEngineInstallation>(list);
 
-        var (remoteInstallations, map) = await _installationService.FetchEngineVersionsAsync();
+        var (remoteInstallations, map) = await _installationRegistryService.FetchEngineVersionsAsync();
         _allAvailableEngineInstallations = remoteInstallations;
 
         _versionToEntryMap.Clear();
@@ -140,7 +140,7 @@ public partial class InstallationsViewModel : ViewModelBase {
                 "installations");
 
         try {
-            var newInstall = await _installService.InstallEngine(entry, targetDirectory, progress);
+            var newInstall = await _engineInstallerService.InstallEngine(entry, targetDirectory, progress);
             if (newInstall != null) {
                 Installations.Add(newInstall);
                 UpdateState();
@@ -223,7 +223,7 @@ public partial class InstallationsViewModel : ViewModelBase {
 
         string displayName = Path.GetFileNameWithoutExtension(fullPath);
 
-        var newEngine = new EngineInstallation {
+        var newEngine = new LocalEngineInstallation {
             Name = displayName,
             ExecutablePath = executablePath,
             DateAdded = DateTime.Now,
@@ -232,7 +232,7 @@ public partial class InstallationsViewModel : ViewModelBase {
         Installations.Add(newEngine);
         UpdateState();
 
-        await _installationService.SaveInstallations(Installations);
+        await _installationRegistryService.SaveInstallations(Installations);
     }
 
     /// <summary>
@@ -240,13 +240,13 @@ public partial class InstallationsViewModel : ViewModelBase {
     /// </summary>
     /// <param name="item"></param>
     [RelayCommand]
-    private async Task RemoveInstallation(EngineInstallation item) {
+    private async Task RemoveInstallation(LocalEngineInstallation item) {
         if (item == null) return;
 
         Installations.Remove(item);
         UpdateState();
 
-        await _installationService.SaveInstallations(Installations);
+        await _installationRegistryService.SaveInstallations(Installations);
     }
 
     /// <summary>
@@ -254,7 +254,7 @@ public partial class InstallationsViewModel : ViewModelBase {
     /// </summary>
     /// <param name="item"></param>
     [RelayCommand]
-    private async Task LaunchInstallation(EngineInstallation item) {
+    private async Task LaunchInstallation(LocalEngineInstallation item) {
         if (item == null) return;
 
         item.RefreshValidation();
@@ -305,7 +305,7 @@ public partial class InstallationsViewModel : ViewModelBase {
     }
 
     [RelayCommand]
-    private void OpenSettings(EngineInstallation item) {
+    private void OpenSettings(LocalEngineInstallation item) {
         if (item == null) return;
         SelectedInstallation = item;
         IsSettingsModalOpen = true;
@@ -315,7 +315,7 @@ public partial class InstallationsViewModel : ViewModelBase {
     private async Task CloseSettings() {
         IsSettingsModalOpen = false;
         SelectedInstallation = null;
-        await _installationService.SaveInstallations(Installations);
+        await _installationRegistryService.SaveInstallations(Installations);
     }
 
     [RelayCommand]
@@ -334,7 +334,7 @@ public partial class InstallationsViewModel : ViewModelBase {
     }
 
     [RelayCommand]
-    private async Task UninstallConfirmation(EngineInstallation? item) {
+    private async Task UninstallConfirmation(LocalEngineInstallation? item) {
         if (item == null) return;
 
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
@@ -347,7 +347,7 @@ public partial class InstallationsViewModel : ViewModelBase {
 
             if (confirmed) {
                 IsSettingsModalOpen = false;
-                await _installService.UninstallEngineAsync(item);
+                await _engineInstallerService.UninstallEngineAsync(item);
 
                 Installations.Remove(item);
 
@@ -373,7 +373,7 @@ public partial class InstallationsViewModel : ViewModelBase {
             })
             .ToList();
 
-        EngineInstallations = new ObservableCollection<EngineInstallation>(filteredList);
+        EngineInstallations = new ObservableCollection<LocalEngineInstallation>(filteredList);
         EngineVersionsAvailable = EngineInstallations.Count > 0;
 
         if (SelectedEngineToInstall != null && !EngineInstallations.Contains(SelectedEngineToInstall)) {

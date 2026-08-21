@@ -30,7 +30,7 @@
                 <ScrollViewer IsVisible="{Binding HasInstallations}">
                     <ItemsControl ItemsSource="{Binding Installations}">
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="m:EngineInstallation">
+                            <DataTemplate x:DataType="m:LocalEngineInstallation">
                                 <Border Margin="0,0,0,8" 
                                         Padding="12" 
                                         Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" 

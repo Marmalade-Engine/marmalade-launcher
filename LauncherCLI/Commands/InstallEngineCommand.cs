@@ -12,16 +12,16 @@ public static class InstallEngineCommand {
         bool search,
         bool skipConfirm,
         SettingsService settingsService,
-        InstallationService installationService,
-        InstallService installService) {
+        InstallationRegistryService installationRegistryService,
+        EngineInstallerService engineInstallerService) {
         
         if (search || string.IsNullOrEmpty(version)) {
-            await SearchDownloadsCommand.SearchAvailableEngines(installationService);
+            await SearchDownloadsCommand.SearchAvailableEngines(installationRegistryService);
 
             return 0;
         }
 
-        var (availableEngines, versionEntryMap) = await installationService.FetchEngineVersionsAsync();
+        var (availableEngines, versionEntryMap) = await installationRegistryService.FetchEngineVersionsAsync();
 
         var targetEngine = availableEngines.FirstOrDefault(x =>
             string.Equals(x.Version, version!, StringComparison.OrdinalIgnoreCase) ||
@@ -65,17 +65,17 @@ public static class InstallEngineCommand {
             Console.Write($"\rInstalling engine '{entry.ResolvedVersion}' {val,5:F1}%");
         });
         
-        EngineInstallation? installedEngine = await installService.InstallEngine(entry, targetDirectory, progress);
+        LocalEngineInstallation? installedEngine = await engineInstallerService.InstallEngine(entry, targetDirectory, progress);
         
         if (installedEngine != null) {
-            var currentInstallations = (await installationService.LoadInstallations()).ToList();
+            var currentInstallations = (await installationRegistryService.LoadInstallations()).ToList();
 
             bool exists = currentInstallations.Any(i => 
                 string.Equals(i.ExecutablePath, installedEngine.ExecutablePath, StringComparison.OrdinalIgnoreCase));
 
             if (!exists) {
                 currentInstallations.Add(installedEngine);
-                await installationService.SaveInstallations(currentInstallations);
+                await installationRegistryService.SaveInstallations(currentInstallations);
             }
 
             Console.WriteLine();

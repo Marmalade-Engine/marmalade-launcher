@@ -7,13 +7,13 @@ public static class UninstallEngineCommand {
     public static async Task<int> Uninstall(
         string? target,
         bool skipConfirm,
-        InstallationService installationService,
-        InstallService installService) {
+        InstallationRegistryService installationRegistryService,
+        EngineInstallerService engineInstallerService) {
 
-        var installations = await installationService.LoadInstallations();
+        var installations = await installationRegistryService.LoadInstallations();
         
         if (string.IsNullOrEmpty(target)) {
-            await ListInstallsCommand.ListInstalls(installationService);
+            await ListInstallsCommand.ListInstalls(installationRegistryService);
             return 0;
         }
         
@@ -42,7 +42,7 @@ public static class UninstallEngineCommand {
         });
         
         try {
-            await installService.UninstallEngineAsync(engine, progress);
+            await engineInstallerService.UninstallEngineAsync(engine, progress);
             
             Console.WriteLine();
             Console.WriteLine($"Successfully uninstalled '{engine.Name}'");

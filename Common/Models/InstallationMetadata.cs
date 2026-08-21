@@ -1,6 +1,6 @@
 namespace MarmaladeLauncher.Models;
 
-public class InstallInfo {
+public class InstallationMetadata {
     public string Branch { get; set; } = string.Empty;
     public string Version { get; set; } = string.Empty;
     public int BuildId { get; set; }
