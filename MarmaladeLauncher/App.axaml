@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="MarmaladeLauncher.App"
              xmlns:local="using:MarmaladeLauncher"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Default"
+             Name="Marmalade Launcher">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
@@ -12,4 +13,10 @@
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
+             
+     <NativeMenu.Menu>
+         <NativeMenu>
+             <NativeMenuItem Header="About Marmalade Launcher" />
+         </NativeMenu>
+     </NativeMenu.Menu>
 </Application>
