@@ -62,25 +62,18 @@ public partial class EngineInstallation : ObservableObject {
     /// <returns></returns>
     public string GetResolvedExecutablePath(string? defaultInstallLocation = null) {
         if (OperatingSystem.IsMacOS() && ExecutablePath != string.Empty && !Path.IsPathRooted(ExecutablePath)) {
-            // If the stored path looks like an .app bundle on macOS, we assume it's relative to a base directory.
-            // First, resolve the full path based on where the installation lives.
             string potentialAppBundlePath = Path.Combine(defaultInstallLocation ?? "", ExecutablePath);
 
             if (Directory.Exists(potentialAppBundlePath) &&
                 potentialAppBundlePath.EndsWith(".app", StringComparison.OrdinalIgnoreCase)) {
-                // If it exists and is an .app bundle, check inside Contents/MacOS for the real binary.
                 string macOsDir = Path.Combine(potentialAppBundlePath, "Contents", "MacOS");
                 if (Directory.Exists(macOsDir)) {
                     var files = Directory.GetFiles(macOsDir);
                     if (files.Length > 0) {
-                        // Return the path to the actual executable binary
                         return Path.Combine(macOsDir, files[0]);
                     }
                 }
             }
-
-            // If resolution failed or it's not a macOS app bundle structure, fall back to the calculated full path.
-            // We still use the original logic for non-Mac paths and direct absolute paths.
         }
 
 
@@ -92,7 +85,7 @@ public partial class EngineInstallation : ObservableObject {
             ? defaultInstallLocation
             : Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "marmalade-launcher", // NOTE: I changed the folder name here to match your provided sample path structure logic
+                "marmalade-launcher",
                 "installations");
 
         string fullPath = Path.Combine(baseDir, ExecutablePath);
