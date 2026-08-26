@@ -9,6 +9,6 @@ build_pht() {
     cp build/Release/pht "$BUNDLE_PATH/Contents/Library/LaunchDaemons/com.marmaladeengine.launcher.pht"
     cp pht/com.marmaladeengine.launcher.pht.plist "$BUNDLE_PATH/Contents/Library/LaunchDaemons/"
 
-    codesign --force --options runtime --timestamp --sign "$DEVELOPER" --entitlements phtctl/phtctl.entitlements "$BUNDLE_PATH/Contents/MacOS/phtctl"
-    codesign --force --options runtime --timestamp --sign "$DEVELOPER" --entitlements pht/pht.entitlements "$BUNDLE_PATH/Contents/Library/LaunchDaemons/com.marmaladeengine.launcher.pht"
+    codesign --force --options runtime --timestamp --sign "$DEVELOPER" --entitlements phtctl/phtctl.entitlements --identifier com.marmaladeengine.launcher.phtctl "$BUNDLE_PATH/Contents/MacOS/phtctl"
+    codesign --force --options runtime --timestamp --sign "$DEVELOPER" --entitlements pht/pht.entitlements --identifier com.marmaladeengine.launcher.pht "$BUNDLE_PATH/Contents/Library/LaunchDaemons/com.marmaladeengine.launcher.pht"
 }
