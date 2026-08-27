@@ -14,6 +14,20 @@
 			remoteGlobalIDString = 94425887303CC97700FA6051;
 			remoteInfo = pht;
 		};
+		9493220E303F950500D9A0E7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 94425880303CC97700FA6051 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 94425887303CC97700FA6051;
+			remoteInfo = pht;
+		};
+		94932210303F950900D9A0E7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 94425880303CC97700FA6051 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 94932209303F94F500D9A0E7;
+			remoteInfo = phtbridge;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,17 +56,57 @@
 		9442589B303CCA1000FA6051 /* phtctl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = phtctl; sourceTree = BUILT_PRODUCTS_DIR; };
 		944258AC303CD12700FA6051 /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		944258AD303CE2A100FA6051 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9493220A303F94F500D9A0E7 /* libphtbridge.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libphtbridge.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9493221A303F953B00D9A0E7 /* Exceptions for "phtbridge" folder in "phtbridge" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				phtbridge.m,
+			);
+			target = 94932209303F94F500D9A0E7 /* phtbridge */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		94932202303E57D600D9A0E7 /* Exceptions for "pht" folder in "Compile Sources" phase from "pht" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 94425884303CC97700FA6051 /* Sources */;
+			membershipExceptions = (
+				launcherProtocol.h,
+			);
+		};
+		9493221B303F953B00D9A0E7 /* Exceptions for "phtbridge" folder in "Compile Sources" phase from "phtbridge" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 94932207303F94F500D9A0E7 /* Sources */;
+			membershipExceptions = (
+				phtbridge.h,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9442588A303CC97700FA6051 /* pht */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				94932202303E57D600D9A0E7 /* Exceptions for "pht" folder in "Compile Sources" phase from "pht" target */,
+			);
 			path = pht;
 			sourceTree = "<group>";
 		};
 		9442589C303CCA1000FA6051 /* phtctl */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = phtctl;
+			sourceTree = "<group>";
+		};
+		94932212303F951500D9A0E7 /* phtbridge */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9493221A303F953B00D9A0E7 /* Exceptions for "phtbridge" folder in "phtbridge" target */,
+				9493221B303F953B00D9A0E7 /* Exceptions for "phtbridge" folder in "Compile Sources" phase from "phtbridge" target */,
+			);
+			path = phtbridge;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -72,6 +126,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		94932208303F94F500D9A0E7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -81,6 +142,7 @@
 				944258AC303CD12700FA6051 /* build.sh */,
 				9442588A303CC97700FA6051 /* pht */,
 				9442589C303CCA1000FA6051 /* phtctl */,
+				94932212303F951500D9A0E7 /* phtbridge */,
 				94425889303CC97700FA6051 /* Products */,
 				944258AD303CE2A100FA6051 /* Info.plist */,
 			);
@@ -91,11 +153,22 @@
 			children = (
 				94425888303CC97700FA6051 /* pht */,
 				9442589B303CCA1000FA6051 /* phtctl */,
+				9493220A303F94F500D9A0E7 /* libphtbridge.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		94932206303F94F500D9A0E7 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		94425887303CC97700FA6051 /* pht */ = {
@@ -112,6 +185,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				9442588A303CC97700FA6051 /* pht */,
+				94932212303F951500D9A0E7 /* phtbridge */,
 			);
 			name = pht;
 			packageProductDependencies = (
@@ -131,6 +205,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				94932211303F950900D9A0E7 /* PBXTargetDependency */,
 				944258A3303CCA2B00FA6051 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
@@ -142,6 +217,26 @@
 			productName = phtctl;
 			productReference = 9442589B303CCA1000FA6051 /* phtctl */;
 			productType = "com.apple.product-type.tool";
+		};
+		94932209303F94F500D9A0E7 /* phtbridge */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9493220B303F94F500D9A0E7 /* Build configuration list for PBXNativeTarget "phtbridge" */;
+			buildPhases = (
+				94932206303F94F500D9A0E7 /* Headers */,
+				94932207303F94F500D9A0E7 /* Sources */,
+				94932208303F94F500D9A0E7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9493220F303F950500D9A0E7 /* PBXTargetDependency */,
+			);
+			name = phtbridge;
+			packageProductDependencies = (
+			);
+			productName = phtbridge;
+			productReference = 9493220A303F94F500D9A0E7 /* libphtbridge.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
 
@@ -156,6 +251,9 @@
 						CreatedOnToolsVersion = 26.6;
 					};
 					9442589A303CCA1000FA6051 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					94932209303F94F500D9A0E7 = {
 						CreatedOnToolsVersion = 26.6;
 					};
 				};
@@ -176,6 +274,7 @@
 			targets = (
 				94425887303CC97700FA6051 /* pht */,
 				9442589A303CCA1000FA6051 /* phtctl */,
+				94932209303F94F500D9A0E7 /* phtbridge */,
 			);
 		};
 /* End PBXProject section */
@@ -195,6 +294,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		94932207303F94F500D9A0E7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -202,6 +308,16 @@
 			isa = PBXTargetDependency;
 			target = 94425887303CC97700FA6051 /* pht */;
 			targetProxy = 944258A2303CCA2B00FA6051 /* PBXContainerItemProxy */;
+		};
+		9493220F303F950500D9A0E7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 94425887303CC97700FA6051 /* pht */;
+			targetProxy = 9493220E303F950500D9A0E7 /* PBXContainerItemProxy */;
+		};
+		94932211303F950900D9A0E7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 94932209303F94F500D9A0E7 /* phtbridge */;
+			targetProxy = 94932210303F950900D9A0E7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -239,7 +355,8 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 7K2D6HGD7U;
@@ -303,7 +420,8 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 7K2D6HGD7U;
@@ -332,8 +450,8 @@
 			buildSettings = {
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = pht/pht.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 7K2D6HGD7U;
@@ -361,8 +479,8 @@
 			buildSettings = {
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = pht/pht.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 7K2D6HGD7U;
@@ -390,6 +508,7 @@
 			buildSettings = {
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = phtctl/phtctl.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 7K2D6HGD7U;
@@ -409,6 +528,7 @@
 				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
 				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
 				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				USER_HEADER_SEARCH_PATHS = ../pht;
 			};
 			name = Debug;
 		};
@@ -417,6 +537,7 @@
 			buildSettings = {
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = phtctl/phtctl.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 7K2D6HGD7U;
@@ -436,6 +557,37 @@
 				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
 				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
 				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				USER_HEADER_SEARCH_PATHS = ../pht;
+			};
+			name = Release;
+		};
+		9493220C303F94F500D9A0E7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = 7K2D6HGD7U;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = ../pht;
+			};
+			name = Debug;
+		};
+		9493220D303F94F500D9A0E7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = 7K2D6HGD7U;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = ../pht;
 			};
 			name = Release;
 		};
@@ -465,6 +617,15 @@
 			buildConfigurations = (
 				944258A0303CCA1000FA6051 /* Debug */,
 				944258A1303CCA1000FA6051 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9493220B303F94F500D9A0E7 /* Build configuration list for PBXNativeTarget "phtbridge" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9493220C303F94F500D9A0E7 /* Debug */,
+				9493220D303F94F500D9A0E7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
