@@ -42,7 +42,7 @@ public static class UninstallEngineCommand {
         });
         
         try {
-            await engineInstallerService.UninstallEngineAsync(engine, progress);
+            await engineInstallerService.UninstallEngine(engine, progress);
             
             Console.WriteLine();
             Console.WriteLine($"Successfully uninstalled '{engine.Name}'");

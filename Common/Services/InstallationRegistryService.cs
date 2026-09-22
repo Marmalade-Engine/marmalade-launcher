@@ -105,7 +105,7 @@ public class InstallationRegistryService {
             }
         }
         catch (Exception ex) {
-            Console.WriteLine($"Error fetching versions: {ex.Message}");
+            Console.WriteLine($"Error fetching versions: {ex.Message}. Using URL: {requestUri}");
         }
 
         return (installations, entryMap);
@@ -114,7 +114,7 @@ public class InstallationRegistryService {
     public static string GetCurrentPlatform() {
         if (OperatingSystem.IsWindows()) return "windows";
         if (OperatingSystem.IsMacOS()) return "macos-arm";
-        if (OperatingSystem.IsLinux()) return "linux";
+        if (OperatingSystem.IsLinux()) return "linux-tar";
         return "windows";
     }
 }

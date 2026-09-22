@@ -29,4 +29,9 @@
       <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\ResourceManagement\MacOS\" />
+      <Folder Include="Services\ResourceManagement\Windows\" />
+    </ItemGroup>
+
 </Project>
