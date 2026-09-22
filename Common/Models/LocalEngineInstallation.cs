@@ -1,14 +1,14 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MarmaladeLauncher.Utils;
 
 namespace MarmaladeLauncher.Models;
 
-/// <summary>
-///     Object used to define an installment of the engine that has been downloaded
-/// </summary>
 public partial class LocalEngineInstallation : ObservableObject {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
@@ -21,12 +21,18 @@ public partial class LocalEngineInstallation : ObservableObject {
 
     public long InstallSize { get; set; }
     public DateTime DateAdded { get; set; }
-    public string Branch { get; set; } = string.Empty;
+    public string Branch { get; set; } = "main";
     public string? Arguments { get; set; }
 
-    /// <summary>
-    /// Indicates whether the target executable or directory cannot be found within the filesystem
-    /// </summary>
+    public ObservableCollection<string> Features { get; set; } = new();
+    public ObservableCollection<string> Changelog { get; set; } = new();
+
+    [JsonIgnore]
+    public bool HasFeatures => Features != null && Features.Any();
+
+    [JsonIgnore]
+    public bool HasChangelog => Changelog != null && Changelog.Any();
+
     [JsonIgnore]
     public bool IsMissing {
         get {
@@ -37,29 +43,15 @@ public partial class LocalEngineInstallation : ObservableObject {
         }
     }
 
-    /// <summary>
-    /// Indicates whether the executable exists and is valid
-    /// </summary>
     public bool IsExecutableValid => !IsMissing;
 
-    /// <summary>
-    /// Returns a human-readable formatted string <see cref="InstallSize"/>
-    /// </summary>
     public string FormattedInstallSize => ByteFormatter.FormatSize(InstallSize);
 
-    /// <summary>
-    /// Forces manual UI refresh for <see cref="IsMissing"/> and <see cref="IsExecutableValid"/>
-    /// </summary>
     public void RefreshValidation() {
         OnPropertyChanged(nameof(IsMissing));
         OnPropertyChanged(nameof(IsExecutableValid));
     }
 
-    /// <summary>
-    /// Resolves the abs path to the engines exec file
-    /// </summary>
-    /// <param name="defaultInstallLocation"></param>
-    /// <returns></returns>
     public string GetResolvedExecutablePath(string? defaultInstallLocation = null) {
         if (OperatingSystem.IsMacOS() && ExecutablePath != string.Empty && !Path.IsPathRooted(ExecutablePath)) {
             string potentialAppBundlePath = Path.Combine(defaultInstallLocation ?? "", ExecutablePath);
@@ -75,7 +67,6 @@ public partial class LocalEngineInstallation : ObservableObject {
                 }
             }
         }
-
 
         if (Path.IsPathRooted(ExecutablePath)) {
             return ExecutablePath;

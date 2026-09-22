@@ -45,13 +45,14 @@ public partial class InstallationsViewModel : ViewModelBase {
     [ObservableProperty] private LocalEngineInstallation? _selectedEngineToInstall;
     [ObservableProperty] private bool _allowDevBuilds;
     [ObservableProperty] private bool _showDevBuilds = true;
+    [ObservableProperty] private InstallScope _selectedInstallScope = InstallScope.UserSpace;
+    [ObservableProperty] private string? _customInstallDirectory;
 
     public InstallationsViewModel(
-        InstallationRegistryService installationRegistryService, 
+        InstallationRegistryService installationRegistryService,
         SettingsService settingsService,
-        LaunchService launchService, 
+        LaunchService launchService,
         EngineInstallerService engineInstallerService) {
-        
         _installationRegistryService = installationRegistryService;
         _settingsService = settingsService;
         _launchService = launchService;
@@ -63,14 +64,12 @@ public partial class InstallationsViewModel : ViewModelBase {
         _ = LoadData();
     }
 
-    /// <summary>
-    /// Fallback designer / parameterless constructor manually bootstrapping dependencies
-    /// </summary>
     public InstallationsViewModel() : this(
         CreateAndLoadInstallationService(),
         CreateAndLoadSettingsService(),
         CreateLaunchService(),
-        CreateEngineInstallerService()) { }
+        CreateEngineInstallerService()) {
+    }
 
     private static SettingsService CreateAndLoadSettingsService() {
         var service = new SettingsService();
@@ -81,7 +80,45 @@ public partial class InstallationsViewModel : ViewModelBase {
     private static InstallationRegistryService CreateAndLoadInstallationService() {
         return new InstallationRegistryService();
     }
+
+    public int SelectedInstallScopeIndex {
+        get => (int)SelectedInstallScope;
+        set => SelectedInstallScope = (InstallScope)value;
+    }
+
+    partial void OnSelectedInstallScopeChanged(InstallScope value) {
+        OnPropertyChanged(nameof(SelectedInstallScopeIndex));
+    }
     
+    public bool HasSelectedEngineFeatures => 
+        SelectedEngineToInstall?.Features != null && SelectedEngineToInstall.Features.Count > 0;
+
+    public bool HasSelectedEngineChangelog => 
+        SelectedEngineToInstall?.Changelog != null && SelectedEngineToInstall.Changelog.Count > 0;
+
+    partial void OnSelectedEngineToInstallChanged(LocalEngineInstallation? value) {
+        OnPropertyChanged(nameof(HasSelectedEngineFeatures));
+        OnPropertyChanged(nameof(HasSelectedEngineChangelog));
+    }
+
+    [RelayCommand]
+    private async Task BrowseCustomInstallDirectory() {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+            var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+            if (topLevel?.StorageProvider == null) return;
+
+            var options = new FolderPickerOpenOptions {
+                Title = "Select Custom Installation Directory",
+                AllowMultiple = false
+            };
+
+            var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(options);
+            if (folders.Count > 0) {
+                CustomInstallDirectory = folders[0].Path.LocalPath;
+            }
+        }
+    }
+
     private static PlatformEngineResolver CreatePlatformEngineResolver() {
         var installEngines = new List<IInstallEngine> { new InstallEngineLinux() };
         var uninstallEngines = new List<IUninstallEngine> { new UninstallEngineLinux() };
@@ -106,7 +143,7 @@ public partial class InstallationsViewModel : ViewModelBase {
         var launchEngines = new List<ILaunchEngine>() {
             new LaunchEngineLinux()
         };
-        
+
         var resolver = new PlatformEngineResolver(installEngines, uninstallEngines, launchEngines);
         var downloader = new FileDownloader();
 

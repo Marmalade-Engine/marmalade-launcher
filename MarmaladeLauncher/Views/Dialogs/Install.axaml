@@ -5,18 +5,18 @@
              xmlns:vm="clr-namespace:MarmaladeLauncher.ViewModels"
              xmlns:localisation="clr-namespace:Common.Assets.Localisation;assembly=MarmaladeLauncher.Common"
              xmlns:models1="clr-namespace:MarmaladeLauncher.Models;assembly=MarmaladeLauncher.Common"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550"
              x:DataType="vm:InstallationsViewModel"
              x:Class="MarmaladeLauncher.Views.Dialogs.Install">
-    
+
     <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
             CornerRadius="8"
             Padding="20"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            MinWidth="700"
+            MinWidth="720"
             MaxHeight="600">
-        
+
         <Grid RowDefinitions="Auto, *, Auto">
 
             <TextBlock Grid.Row="0"
@@ -38,6 +38,7 @@
                   Margin="0,0,0,15"
                   IsVisible="{Binding EngineVersionsAvailable}">
 
+                <!-- Left Column: Available Installations List -->
                 <ListBox Grid.Column="0"
                          Margin="0,0,10,0"
                          ItemsSource="{Binding EngineInstallations}"
@@ -64,15 +65,129 @@
                         CornerRadius="6"
                         IsVisible="{Binding SelectedEngineToInstall, Converter={x:Static ObjectConverters.IsNotNull}}">
                     <Grid RowDefinitions="*, Auto">
-                        <StackPanel Grid.Row="0" Spacing="8">
-                            <TextBlock Text="{Binding SelectedEngineToInstall.Name}" FontSize="18" FontWeight="Bold" />
-                            <TextBlock Text="{Binding SelectedEngineToInstall.Version, StringFormat='Version: {0}'}" />
-                            <TextBlock Text="{Binding SelectedEngineToInstall.FormattedInstallSize, StringFormat='Size: {0}'}" />
-                            <TextBlock Text="{Binding SelectedEngineToInstall.Branch, StringFormat='Branch: {0}'}" />
-                        </StackPanel>
 
-                        <StackPanel Grid.Row="1" Spacing="4" IsVisible="{Binding IsInstalling}">
-                            <TextBlock Text="{x:Static localisation:Resources.Modal_NewInstall_DownloadingPrompt}" FontSize="12" Foreground="Gray" />
+                        <Grid Grid.Row="0" RowDefinitions="Auto, *">
+                            <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,12">
+                                <TextBlock Text="{Binding SelectedEngineToInstall.Name}"
+                                           FontSize="18"
+                                           FontWeight="Bold" />
+
+                                <WrapPanel Orientation="Horizontal">
+                                    <Border Background="{DynamicResource SystemAccentColorDark2}"
+                                            CornerRadius="12"
+                                            Padding="10,4"
+                                            Margin="0,0,6,6">
+                                        <TextBlock Text="{Binding SelectedEngineToInstall.Version, StringFormat='v{0}'}"
+                                                   Foreground="White"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold" />
+                                    </Border>
+
+                                    <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                                            CornerRadius="12"
+                                            Padding="10,4"
+                                            Margin="0,0,6,6">
+                                        <TextBlock Text="{Binding SelectedEngineToInstall.FormattedInstallSize}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold" />
+                                    </Border>
+
+                                    <Border Background="{DynamicResource SystemAccentColorLight2}"
+                                            CornerRadius="12"
+                                            Padding="10,4"
+                                            Margin="0,0,6,6">
+                                        <TextBlock Text="{Binding SelectedEngineToInstall.Branch}"
+                                                   Foreground="Black"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold" />
+                                    </Border>
+                                </WrapPanel>
+                            </StackPanel>
+
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <StackPanel Spacing="8">
+                                    
+                                    <Expander HorizontalAlignment="Stretch"
+                                              Header="Features"
+                                              IsExpanded="True"
+                                              Padding="8">
+                                        <Panel>
+                                            <ScrollViewer MaxHeight="150"
+                                                          VerticalScrollBarVisibility="Auto"
+                                                          IsVisible="{Binding SelectedEngineToInstall.HasFeatures}">
+                                                <ItemsControl ItemsSource="{Binding SelectedEngineToInstall.Features}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="x:String">
+                                                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2">
+                                                                <TextBlock Text="•" Foreground="{DynamicResource SystemAccentColor}" />
+                                                                <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+
+                                            <TextBlock Text="No features specified for this version."
+                                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                       FontStyle="Italic"
+                                                       IsVisible="{Binding !SelectedEngineToInstall.HasFeatures}" />
+                                        </Panel>
+                                    </Expander>
+
+                                    <Expander HorizontalAlignment="Stretch"
+                                              Header="Changelog"
+                                              IsExpanded="False"
+                                              Padding="8">
+                                        <Panel>
+                                            <ScrollViewer MaxHeight="150"
+                                                          VerticalScrollBarVisibility="Auto"
+                                                          IsVisible="{Binding SelectedEngineToInstall.HasChangelog}">
+                                                <ItemsControl ItemsSource="{Binding SelectedEngineToInstall.Changelog}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="x:String">
+                                                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2">
+                                                                <TextBlock Text="-" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                                <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+
+                                            <TextBlock Text="No changelog available for this build."
+                                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                       FontStyle="Italic"
+                                                       IsVisible="{Binding !SelectedEngineToInstall.HasChangelog}" />
+                                        </Panel>
+                                    </Expander>
+
+                                    <Expander HorizontalAlignment="Stretch"
+                                              Header="Install Configuration"
+                                              IsExpanded="False"
+                                              IsEnabled="{Binding !IsInstalling}"
+                                              Padding="8">
+                                        <StackPanel Spacing="10">
+                                            <StackPanel Spacing="4">
+                                                <TextBlock Text="Installation Scope" 
+                                                           FontSize="12" 
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                <ComboBox SelectedIndex="{Binding SelectedInstallScopeIndex, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch"
+                                                          IsEnabled="{Binding !IsInstalling}">
+                                                    <ComboBoxItem Content="User (Recommended)" />
+                                                    <ComboBoxItem Content="System" />
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Expander>
+
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+
+                        <StackPanel Grid.Row="1" Spacing="4" Margin="0,12,0,0" IsVisible="{Binding IsInstalling}">
+                            <TextBlock Text="{x:Static localisation:Resources.Modal_NewInstall_DownloadingPrompt}"
+                                       FontSize="12" Foreground="Gray" />
                             <ProgressBar Minimum="0" Maximum="100" Value="{Binding DownloadProgress}" Height="8" />
                         </StackPanel>
                     </Grid>
