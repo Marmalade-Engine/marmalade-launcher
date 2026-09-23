@@ -25,6 +25,7 @@ namespace MarmaladeLauncher.ViewModels;
 public partial class InstallationsViewModel : ViewModelBase {
     private readonly InstallationRegistryService _installationRegistryService;
     private readonly SettingsService _settingsService;
+    public LauncherSettings Settings => _settingsService.Settings;
     private readonly LaunchService _launchService;
     private readonly EngineInstallerService _engineInstallerService;
 
@@ -34,6 +35,9 @@ public partial class InstallationsViewModel : ViewModelBase {
     [ObservableProperty] private double _downloadProgress;
 
     private List<LocalEngineInstallation> _allAvailableEngineInstallations = new();
+
+    public bool IsLinux => OperatingSystem.IsLinux();
+    public bool IsMacOS => OperatingSystem.IsMacOS();
 
     [ObservableProperty] private ObservableCollection<LocalEngineInstallation> _installations = new();
     [ObservableProperty] private ObservableCollection<LocalEngineInstallation> _engineInstallations = new();
@@ -45,8 +49,35 @@ public partial class InstallationsViewModel : ViewModelBase {
     [ObservableProperty] private LocalEngineInstallation? _selectedEngineToInstall;
     [ObservableProperty] private bool _allowDevBuilds;
     [ObservableProperty] private bool _showDevBuilds = true;
-    [ObservableProperty] private InstallScope _selectedInstallScope = InstallScope.UserSpace;
+    [ObservableProperty] private InstallScope _selectedInstallScope = InstallScope.InstallScope_USER;
     [ObservableProperty] private string? _customInstallDirectory;
+
+    public IReadOnlyList<LinuxPackageType> LinuxPackageTypes { get; } =
+        Enum.GetValues<LinuxPackageType>();
+
+    public IReadOnlyList<MacPackageType> MacPackageTypes { get; } =
+        Enum.GetValues<MacPackageType>();
+
+    public int PreferredLinuxPackageIndex {
+        get => (int)Settings.PreferredLinuxPackageType;
+        set {
+            if (value >= 0) {
+                Settings.PreferredLinuxPackageType = (LinuxPackageType)value;
+                _settingsService.SaveSettings(Settings);
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public int PreferredMacPackageIndex {
+        get => (int)Settings.PreferredMacPackageType;
+        set {
+            if (value >= 0) {
+                Settings.PreferredMacPackageType = (MacPackageType)value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public InstallationsViewModel(
         InstallationRegistryService installationRegistryService,
@@ -89,11 +120,11 @@ public partial class InstallationsViewModel : ViewModelBase {
     partial void OnSelectedInstallScopeChanged(InstallScope value) {
         OnPropertyChanged(nameof(SelectedInstallScopeIndex));
     }
-    
-    public bool HasSelectedEngineFeatures => 
+
+    public bool HasSelectedEngineFeatures =>
         SelectedEngineToInstall?.Features != null && SelectedEngineToInstall.Features.Count > 0;
 
-    public bool HasSelectedEngineChangelog => 
+    public bool HasSelectedEngineChangelog =>
         SelectedEngineToInstall?.Changelog != null && SelectedEngineToInstall.Changelog.Count > 0;
 
     partial void OnSelectedEngineToInstallChanged(LocalEngineInstallation? value) {
@@ -164,7 +195,8 @@ public partial class InstallationsViewModel : ViewModelBase {
 
         Installations = new ObservableCollection<LocalEngineInstallation>(list);
 
-        var (remoteInstallations, map) = await _installationRegistryService.FetchEngineVersionsAsync();
+        var (remoteInstallations, map) =
+            await _installationRegistryService.FetchEngineVersionsAsync(_settingsService.Settings);
         _allAvailableEngineInstallations = remoteInstallations;
 
         _versionToEntryMap.Clear();
@@ -333,6 +365,7 @@ public partial class InstallationsViewModel : ViewModelBase {
                     if (desktop.MainWindow != null) {
                         desktop.MainWindow.WindowState = WindowState.Minimized;
                     }
+
                     break;
 
                 case PostLaunchBehaviour.PostLaunchBehaviour_CLOSE:

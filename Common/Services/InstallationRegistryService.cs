@@ -51,9 +51,11 @@ public class InstallationRegistryService {
     public async
         Task<(List<LocalEngineInstallation> Installations, Dictionary<LocalEngineInstallation, RemoteBuildEntry> EntryMap)>
         FetchEngineVersionsAsync(
+            LauncherSettings settings = null,
             string? platform = null,
             string branch = "dev") {
-        platform ??= GetCurrentPlatform();
+        
+        platform ??= GetCurrentPlatform(settings);
         string requestUri = $"{BaseDownloadUri}?product=marmalade-engine&branch={branch}&platform={platform}&list";
 
         var installations = new List<LocalEngineInstallation>();
@@ -111,10 +113,23 @@ public class InstallationRegistryService {
         return (installations, entryMap);
     }
 
-    public static string GetCurrentPlatform() {
+    public static string GetCurrentPlatform(LauncherSettings? settings = null) {
         if (OperatingSystem.IsWindows()) return "windows";
-        if (OperatingSystem.IsMacOS()) return "macos-arm";
-        if (OperatingSystem.IsLinux()) return "linux-tar";
+
+        if (OperatingSystem.IsMacOS()) {
+            return settings.PreferredMacPackageType switch {
+                MacPackageType.MacPackageType_TAR => "linux-tar",
+                _ => "macos-arm"
+            };
+        }
+
+        if (OperatingSystem.IsLinux()) {
+            return settings.PreferredLinuxPackageType switch {
+                LinuxPackageType.LinuxPackageType_APPIMAGE => "linux-appimage",
+                _ => "linux-tar"
+            };
+        }
+        
         return "windows";
     }
 }

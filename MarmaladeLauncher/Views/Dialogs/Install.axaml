@@ -178,6 +178,30 @@
                                                     <ComboBoxItem Content="System" />
                                                 </ComboBox>
                                             </StackPanel>
+                                            
+                                            <StackPanel Spacing="4" IsVisible="{Binding IsLinux}">
+                                                <TextBlock Text="Package Format" 
+                                                           FontSize="12" 
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                <ComboBox SelectedIndex="{Binding PreferredLinuxPackageIndex, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch"
+                                                          IsEnabled="{Binding !IsInstalling}">
+                                                    <ComboBoxItem Content="Tar (Recommended)" />
+                                                    <ComboBoxItem Content="Appimage" />
+                                                </ComboBox>
+                                            </StackPanel>
+
+                                            <StackPanel Spacing="4" IsVisible="{Binding IsMacOS}">
+                                                <TextBlock Text="Package Format" 
+                                                           FontSize="12" 
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                <ComboBox SelectedIndex="{Binding PreferredMacPackageIndex, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch"
+                                                          IsEnabled="{Binding !IsInstalling}">
+                                                    <ComboBoxItem Content="Universal (Recommended)" />
+                                                    <ComboBoxItem Content="Tar" />
+                                                </ComboBox>
+                                            </StackPanel>
                                         </StackPanel>
                                     </Expander>
 

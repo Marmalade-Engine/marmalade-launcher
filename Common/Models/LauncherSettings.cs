@@ -12,14 +12,28 @@ public enum PostLaunchBehaviour {
 }
 
 public enum InstallScope {
-    UserSpace,
-    SystemSpace
+    InstallScope_USER,
+    InstallScope_SYS
 }
+
+public enum LinuxPackageType {
+    LinuxPackageType_TAR,
+    LinuxPackageType_APPIMAGE,
+}
+
+public enum MacPackageType {
+    MacPackageType_UNIVERSAL,
+    MacPackageType_TAR,
+}
+
 
 public class LauncherSettings {
     public string DefaultInstallLocation { get; set; } = SettingsService.DefaultBaseDirectory;
     public PostLaunchBehaviour PostLaunchBehaviour { get; set; } = PostLaunchBehaviour.PostLaunchBehaviour_KEEPOPEN;
     public string CurrentLocale { get; set; } = "en-GB";
     public bool EnableDevBuilds { get; set; } = false;
-    public InstallScope PreferredInstallScope { get; set; } = InstallScope.UserSpace;
+    public InstallScope PreferredInstallScope { get; set; } = InstallScope.InstallScope_USER;
+    
+    public LinuxPackageType PreferredLinuxPackageType { get; set; } = LinuxPackageType.LinuxPackageType_TAR;
+    public MacPackageType PreferredMacPackageType { get; set; } = MacPackageType.MacPackageType_TAR;
 }
