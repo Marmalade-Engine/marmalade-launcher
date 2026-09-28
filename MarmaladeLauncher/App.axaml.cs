@@ -17,7 +17,7 @@ public partial class App : Application {
 
     public override void OnFrameworkInitializationCompleted() {
         var settingsService = new SettingsService();
-        settingsService.EnsureDirectoriesExist();
+        settingsService.EnsureUserDirectoriesExist();
 
         var localisationService = new LocalisationService(settingsService);
     

@@ -33,7 +33,7 @@ public class EngineInstallerService {
 
     public async Task<LocalEngineInstallation?> InstallEngine(
         RemoteBuildEntry entry,
-        string targetDirectory,
+        InstallScope installScope,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default
     ) {
@@ -43,6 +43,8 @@ public class EngineInstallerService {
 
         string resolvedEngineVersion = entry.ResolvedVersion;
 
+        string targetDirectory = ResolveInstallDestinationPathFromScope(installScope);
+        
         string installDirectory = Path.Combine(targetDirectory, Guid.NewGuid().ToString());
         Directory.CreateDirectory(installDirectory);
 
@@ -106,7 +108,7 @@ public class EngineInstallerService {
     public async Task UninstallEngine(LocalEngineInstallation entry, IProgress<double>? progress = null,
         CancellationToken cancellationToken = default) {
 
-        string targetPath = entry.GetResolvedExecutablePath(_settingsService.Settings.DefaultInstallLocation);
+        string targetPath = entry.GetResolvedExecutablePath(_settingsService.Settings.DefaultUserInstallLocation);
         
         var uninstallEngine = _engineResolver.GetUninstallEngine();
         
@@ -130,5 +132,28 @@ public class EngineInstallerService {
         string displayName = !string.IsNullOrWhiteSpace(entry.name) ? entry.name : $"Marmalade {version}";
         int duplicateCount = existing.FindAll(i => i.Version.Equals(version, StringComparison.OrdinalIgnoreCase)).Count;
         return duplicateCount > 0 ? $"{displayName} ({duplicateCount + 1})" : displayName;
+    }
+
+    private string ResolveInstallDestinationPathFromScope(InstallScope scope) {
+        if (scope == InstallScope.InstallScope_USER) {
+            return !string.IsNullOrWhiteSpace(_settingsService.Settings.DefaultUserInstallLocation)
+                ? _settingsService.Settings.DefaultUserInstallLocation
+                : Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    SettingsService.DefaultUserDirectory,
+                    "installations");
+            
+        }
+
+        if (scope == InstallScope.InstallScope_SYS) {
+            return !string.IsNullOrWhiteSpace(_settingsService.Settings.DefaultSysInstallLocation)
+                ? _settingsService.Settings.DefaultSysInstallLocation
+                : Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                    SettingsService.DefaultSysDirectory,
+                    "installations");
+        }
+        
+        return "";
     }
 }

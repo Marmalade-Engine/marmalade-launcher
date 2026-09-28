@@ -1,6 +1,3 @@
-using System;
-using System.Globalization;
-using System.IO;
 using MarmaladeLauncher.Services;
 
 namespace MarmaladeLauncher.Models;
@@ -28,7 +25,9 @@ public enum MacPackageType {
 
 
 public class LauncherSettings {
-    public string DefaultInstallLocation { get; set; } = SettingsService.DefaultBaseDirectory;
+    public string DefaultUserInstallLocation { get; set; } = SettingsService.DefaultUserDirectory;
+    public string DefaultSysInstallLocation { get; set; } = SettingsService.DefaultSysDirectory;
+    
     public PostLaunchBehaviour PostLaunchBehaviour { get; set; } = PostLaunchBehaviour.PostLaunchBehaviour_KEEPOPEN;
     public string CurrentLocale { get; set; } = "en-GB";
     public bool EnableDevBuilds { get; set; } = false;

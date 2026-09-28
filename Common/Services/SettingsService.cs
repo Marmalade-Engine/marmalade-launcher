@@ -10,32 +10,47 @@ namespace MarmaladeLauncher.Services;
 public class SettingsService {
     public LauncherSettings Settings { get; set; } = new();
 
-    public static string AppDataDir => Path.Combine(
+    public static string UserAppDataDir => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "marmalade-launcher"
     );
     
-    public static string SettingsFilePath => Path.Combine(AppDataDir, "settings.json");
-    public static string DefaultBaseDirectory => Path.Combine(AppDataDir, "installations");
+    public static string SysAppDataDir => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+        "marmalade-launcher"
+    );
+    
+    public static string SettingsFilePath => Path.Combine(UserAppDataDir, "settings.json");
+    public static string DefaultUserDirectory => Path.Combine(UserAppDataDir, "installations");
+    
+    public static string DefaultSysDirectory => Path.Combine(SysAppDataDir, "installations");
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
     
     public SettingsService() {
         LoadSettings();
-        EnsureDirectoriesExist();
+        EnsureUserDirectoriesExist();
     }
 
-    public void EnsureDirectoriesExist() {
-        if (!Directory.Exists(AppDataDir)) {
-            Directory.CreateDirectory(AppDataDir);
+    public void EnsureUserDirectoriesExist() {
+        if (!Directory.Exists(UserAppDataDir)) {
+            Directory.CreateDirectory(UserAppDataDir);
         }
 
-        if (!string.IsNullOrWhiteSpace(Settings.DefaultInstallLocation)) {
-            if (!Directory.Exists(Settings.DefaultInstallLocation)) {
-                Console.WriteLine($"Launcher directory does not exist, creating it at: {Settings.DefaultInstallLocation}");
-                Directory.CreateDirectory(Settings.DefaultInstallLocation);
+        if (!string.IsNullOrWhiteSpace(Settings.DefaultUserInstallLocation)) {
+            if (!Directory.Exists(Settings.DefaultUserInstallLocation)) {
+                Console.WriteLine($"Launcher directory does not exist, creating it at: {Settings.DefaultUserInstallLocation}");
+                Directory.CreateDirectory(Settings.DefaultUserInstallLocation);
             }
         }
+    }
+
+    public void EnsureSysDirectoriesExist() {
+        if (!Directory.Exists(SysAppDataDir)) {
+            Directory.CreateDirectory(SysAppDataDir);
+        }
+        
+        if (!string.IsNullOrWhiteSpace(Settings.DefaultUserInstallLocation)) {}
     }
 
     public void LoadSettings() {
@@ -56,8 +71,8 @@ public class SettingsService {
     public async Task SaveSettings(LauncherSettings settings) {
         Settings = settings;
         
-        if (!string.IsNullOrWhiteSpace(Settings.DefaultInstallLocation) && !Directory.Exists(Settings.DefaultInstallLocation)) {
-            Directory.CreateDirectory(Settings.DefaultInstallLocation);
+        if (!string.IsNullOrWhiteSpace(Settings.DefaultUserInstallLocation) && !Directory.Exists(Settings.DefaultUserInstallLocation)) {
+            Directory.CreateDirectory(Settings.DefaultUserInstallLocation);
         }
 
         string json = JsonSerializer.Serialize(Settings, JsonOptions);

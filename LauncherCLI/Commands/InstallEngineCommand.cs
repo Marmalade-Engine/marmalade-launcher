@@ -39,11 +39,11 @@ public static class InstallEngineCommand {
 
         string targetDirectory = !string.IsNullOrWhiteSpace(customOutputDir)
             ? customOutputDir
-            : (!string.IsNullOrWhiteSpace(settingsService.Settings.DefaultInstallLocation)
-                ? settingsService.Settings.DefaultInstallLocation
+            : (!string.IsNullOrWhiteSpace(settingsService.Settings.DefaultUserInstallLocation)
+                ? settingsService.Settings.DefaultUserInstallLocation
                 : Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    SettingsService.DefaultBaseDirectory,
+                    SettingsService.DefaultUserDirectory,
                     "installations"));
 
         string installSize = ByteFormatter.FormatSize(entry.size);
@@ -65,7 +65,8 @@ public static class InstallEngineCommand {
             Console.Write($"\rInstalling engine '{entry.ResolvedVersion}' {val,5:F1}%");
         });
         
-        LocalEngineInstallation? installedEngine = await engineInstallerService.InstallEngine(entry, targetDirectory, progress);
+        // TODO: Add an arg to the install cmd that allows the user to define install scope, defaulting to user
+        LocalEngineInstallation? installedEngine = await engineInstallerService.InstallEngine(entry, InstallScope.InstallScope_USER, progress);
         
         if (installedEngine != null) {
             var currentInstallations = (await installationRegistryService.LoadInstallations()).ToList();

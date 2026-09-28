@@ -17,7 +17,7 @@ public class InstallationRegistryService {
     };
 
     public static string InstallationsFilePath =>
-        Path.Combine(SettingsService.AppDataDir, "installations.json");
+        Path.Combine(SettingsService.UserAppDataDir, "installations.json");
 
     static InstallationRegistryService() {
         HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("MarmaladeLauncher/1.0");

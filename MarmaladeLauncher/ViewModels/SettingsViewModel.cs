@@ -37,7 +37,7 @@ public partial class SettingsViewModel : ViewModelBase {
 
     [ObservableProperty] private bool _isDirty;
 
-    public string DefaultPathPlaceholder { get; } = SettingsService.DefaultBaseDirectory;
+    public string DefaultPathPlaceholder { get; } = SettingsService.DefaultUserDirectory;
 
     public List<PostLaunchOption> PostLaunchOptions { get; } = [
         new(PostLaunchBehaviour.PostLaunchBehaviour_KEEPOPEN),
@@ -84,7 +84,7 @@ public partial class SettingsViewModel : ViewModelBase {
     private void CheckDirtyState() {
         if (_settingsService?.Settings == null) return;
 
-        bool isLocationDirty = DefaultInstallLocation != _settingsService.Settings.DefaultInstallLocation;
+        bool isLocationDirty = DefaultInstallLocation != _settingsService.Settings.DefaultUserInstallLocation;
         bool isBehaviorDirty = SelectedPostLaunchOption?.Value != _settingsService.Settings.PostLaunchBehaviour;
         bool isLocaleDirty = _selectedLocale?.LocaleKey != _settingsService.Settings.CurrentLocale;
         bool isDevBuildsDirty = EnableDevBuilds != _settingsService.Settings.EnableDevBuilds;
@@ -94,7 +94,7 @@ public partial class SettingsViewModel : ViewModelBase {
 
     [RelayCommand]
     private void ResetToDefault() {
-        DefaultInstallLocation = SettingsService.DefaultBaseDirectory;
+        DefaultInstallLocation = SettingsService.DefaultUserDirectory;
     }
 
     [RelayCommand]
@@ -107,7 +107,7 @@ public partial class SettingsViewModel : ViewModelBase {
         var savedBehaviour = _settingsService.Settings.PostLaunchBehaviour;
         var savedLocaleKey = _settingsService.Settings.CurrentLocale;
 
-        DefaultInstallLocation = _settingsService.Settings.DefaultInstallLocation;
+        DefaultInstallLocation = _settingsService.Settings.DefaultUserInstallLocation;
 
         SelectedPostLaunchOption = PostLaunchOptions.FirstOrDefault(o => o.Value == savedBehaviour)
                                    ?? PostLaunchOptions[0];
@@ -138,7 +138,7 @@ public partial class SettingsViewModel : ViewModelBase {
     [RelayCommand]
     private async Task SaveAsync() {
         var updatedSettings = new LauncherSettings {
-            DefaultInstallLocation = DefaultInstallLocation,
+            DefaultUserInstallLocation = DefaultInstallLocation,
             PostLaunchBehaviour = SelectedPostLaunchOption.Value,
             CurrentLocale = _selectedLocale?.LocaleKey ?? "en-GB",
             EnableDevBuilds = EnableDevBuilds

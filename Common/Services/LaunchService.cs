@@ -21,7 +21,7 @@ public class LaunchService {
         if (string.IsNullOrWhiteSpace(item?.ExecutablePath)) return false;
 
         try {
-            string resolvedPath = item.GetResolvedExecutablePath(_settingsService.Settings.DefaultInstallLocation);
+            string resolvedPath = item.GetResolvedExecutablePath(_settingsService.Settings.DefaultUserInstallLocation);
             var args = CombineArgs(item.Arguments, extraArgs);
 
             var launcher = _engineResolver.GetLaunchEngine();

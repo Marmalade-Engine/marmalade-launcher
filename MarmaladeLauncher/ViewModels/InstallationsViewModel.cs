@@ -228,15 +228,8 @@ public partial class InstallationsViewModel : ViewModelBase {
         IsInstalling = true;
         var progress = new Progress<double>(val => DownloadProgress = val);
 
-        string targetDirectory = !string.IsNullOrWhiteSpace(_settingsService.Settings.DefaultInstallLocation)
-            ? _settingsService.Settings.DefaultInstallLocation
-            : Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                SettingsService.DefaultBaseDirectory,
-                "installations");
-
         try {
-            var newInstall = await _engineInstallerService.InstallEngine(entry, targetDirectory, progress);
+            var newInstall = await _engineInstallerService.InstallEngine(entry, SelectedInstallScope, progress);
             if (newInstall != null) {
                 Installations.Add(newInstall);
                 UpdateState();
@@ -340,7 +333,7 @@ public partial class InstallationsViewModel : ViewModelBase {
         if (!item.IsExecutableValid) {
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
                 && desktop.MainWindow != null) {
-                string resolvedPath = item.GetResolvedExecutablePath(_settingsService.Settings.DefaultInstallLocation);
+                string resolvedPath = item.GetResolvedExecutablePath(_settingsService.Settings.DefaultUserInstallLocation);
                 var box = MessageBoxManager.GetMessageBoxStandard(
                     Resources.Installations_MissingExecutable_Prompt_Title,
                     string.Format(Resources.Installations_MissingExecutable_Prompt_Body, item.Name, resolvedPath),
